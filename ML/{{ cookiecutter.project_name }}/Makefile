@@ -200,7 +200,7 @@ dk-down:
 	$(DOCKER_COMPOSE) down
 
 # Restart all services
-dk-restart: dk-dk-down up
+dk-restart: dk-down dk-up
 
 # View logs for all services
 logs:

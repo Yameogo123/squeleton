@@ -7,14 +7,8 @@ Welcome to my react JS squeleton. This will show you how to use it directly for 
 - you need, of course, to install node (and npm) on your computer.
 - you need then to install cookiecutter `npm install cookiecutter` or through python `pip install cookiecutter`
 
-#### 2. project initialization
 
-```
-cookiecutter https://github.com/Yameogo123/xxxxxxxx 
-```
-
-
-#### 3. the squeleton 
+#### 2. the squeleton 
 
 ```
 ---
@@ -44,7 +38,7 @@ cookiecutter https://github.com/Yameogo123/xxxxxxxx
 ---
 ```
 
-#### 4. how it works
+#### 3. how it works
 
 a- Install an environment, the modules
 

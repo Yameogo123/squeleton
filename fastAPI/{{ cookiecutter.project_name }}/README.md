@@ -1,6 +1,6 @@
 # {{ cookiecutter.project_name }}
 
-Medical API for our medical front app
+{{ cookiecutter.description }}
 
 ## Run in CMD
 

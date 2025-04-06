@@ -1,6 +1,11 @@
 
 
-YOU HAVE AT YOUR DISPOSAL ALL THE COOKIECUTTER SQUELETON
+YOU HAVE AT YOUR DISPOSAL SOME COOKIECUTTER SQUELETON
+
+
+#### requirements: 
+- you need, of course, to install node (and npm) on your computer; or python
+- you need also to install cookiecutter `npm install cookiecutter` or through python `pip install cookiecutter`
 
 
 1. **fastAPI**: For all fastAPI application (using python packaging system)

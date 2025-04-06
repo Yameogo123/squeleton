@@ -1,11 +1,11 @@
 {
     "project_name": "My ML Project",
     "package_name": "{{ cookiecutter.project_name.lower().replace(' ', '_').replace('-', '_') }}",
-    "package_slug": "{{ cookiecutter.package_name | lower | replace(' ', '_') | replace('-', '_') }}",
+    "package_slug": ["{{ cookiecutter.package_name | lower | replace(' ', '_') | replace('-', '_') }}"],
     "python_version": "3.12",
     "author_name": "Your Name",
     "description": "A template for machine learning projects.",
-    "open_source": "yes",
+    "open_source": ["yes", "no"],
     "open_source_license": ["No license file", "MIT", "BSD-3-Clause"],
     "python_interpreter": ["python3", "python"]
 }
