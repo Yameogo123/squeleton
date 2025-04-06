@@ -2,14 +2,34 @@
 
 {{ cookiecutter.description }}
 
-## Running with Docker
+### steps:
 
-1. Build and run the services:
-   ```bash
-   docker-compose up --build
+#### 1. requirements: 
+- you need, of course, to install python on your computer.
+- you need then to install cookiecutter on python `pip install cookiecutter`
+
+#### 2. prepare environment:
+
+Use pyenv or conda env
+
+- Create pyenv environnemment (or conda env : conda_env)
+```bash
+   make pyenv_env
+```
+
+- If not activate: activate the env created (do it yourself)
+
+- Install the requirements next:
+```bash
+   make dev-install
+```
+
+(**Optionnal**) you can use a venv if you want.
 
 
-#### the squeleton
+(The rest of the command are in the makefile. You can open it to see.)
+
+#### 3. the squeleton 
 
 ```
 ---
