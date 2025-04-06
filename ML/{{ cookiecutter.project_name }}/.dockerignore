@@ -1,0 +1,9 @@
+.git
+**/node_modules
+**/venv
+**/.env
+**/.gitignore
+**/.dockerignore
+**/README.md
+**/dist
+**/build
