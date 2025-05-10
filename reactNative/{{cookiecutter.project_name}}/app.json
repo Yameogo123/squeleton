@@ -1,0 +1,56 @@
+{
+  "expo": {
+    "name": "{{cookiecutter.project_name}}",
+    "slug": "{{cookiecutter.project_slug}}",
+    "version": "{{cookiecutter.version}}",
+    "orientation": "portrait",
+    "icon": "./assets/images/logo.png",
+    "scheme": "{{cookiecutter.project_slug}}",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.package.{{cookiecutter.project_slug}}"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.package.MedicalApp"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "splash": {
+      "image": "./assets/images/logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFFFFF"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/logo.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "6c849356-b652-4a58-8117-0d3bd2467775"
+      }
+    }
+  }
+}
