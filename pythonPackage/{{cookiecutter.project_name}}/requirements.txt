@@ -1,0 +1,76 @@
+# basics
+numpy
+pandas
+scikit-learn
+pytest
+cookiecutter
+make
+python-dotenv>=0.5.1
+scipy==1.15
+click
+statsmodels
+loguru
+pretty-errors
+
+# visualization
+plotly
+
+# backend
+fastapi[standard]
+email-validator
+passlib[bcrypt]
+pyjwt
+python-decouple
+pyarrow
+uvicorn 
+python-multipart
+bcrypt==3.2.0
+
+# ETL orchestration
+dagster 
+dagster-webserver 
+
+# frontend
+streamlit
+st-pages
+
+
+{% if cookiecutter.python_interpreter != 'python3' %}
+# backwards compatibility
+pathlib2
+{% endif %}
+
+
+# Documentation sphinx
+furo
+sphinx-book-theme
+sphinx
+sphinx-copybutton
+sphinx-last-updated-by-git
+sphinx-view
+sphinx_inline_tabs
+sphinxcontrib.bibtex
+sphinxcontrib.mermaid
+sphinx-autobuild
+sphinx_git
+sphinx-favicon
+nbsphinx
+pandoc
+wheel
+sphinx-simplepdf
+sphinxcontrib-youtube
+sphinxprettysearchresults
+sphinxcontrib-googleanalytics==0.4
+
+
+# Data Science
+flaml
+xgboost
+kmodes
+hdbscan
+gower
+autots
+prophet
+
+# analysis
+skimpy

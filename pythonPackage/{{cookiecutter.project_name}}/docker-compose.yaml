@@ -1,0 +1,17 @@
+
+services:
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app  # Mount the current directory to /app in the container
+    command: python app/backend/main.py
+
+  frontend:
+    build: .
+    ports:
+      - "8501:8501"
+    volumes:
+      - .:/app  # Mount the current directory to /app in the container
+    command: streamlit run app/frontend/app.py --server.port 8501 --server.address 0.0.0.0
