@@ -26,10 +26,6 @@ uvicorn
 python-multipart
 bcrypt==3.2.0
 
-# ETL orchestration
-dagster 
-dagster-webserver 
-
 # frontend
 streamlit
 st-pages
@@ -62,15 +58,3 @@ sphinxcontrib-youtube
 sphinxprettysearchresults
 sphinxcontrib-googleanalytics==0.4
 
-
-# Data Science
-flaml
-xgboost
-kmodes
-hdbscan
-gower
-autots
-prophet
-
-# analysis
-skimpy

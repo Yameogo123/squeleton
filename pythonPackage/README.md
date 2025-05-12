@@ -12,7 +12,7 @@ Welcome to my python squeleton. This will show you how to use it directly for yo
 #### 2. project initialization
 
 ```
-cookiecutter https://github.com/Yameogo123/python_squeleton.git 
+cookiecutter https://github.com/Yameogo123/squeleton.git --directory="pythonPackage"
 ```
 
 
@@ -37,30 +37,21 @@ cookiecutter https://github.com/Yameogo123/python_squeleton.git
 │
 ├── notebooks          <- Jupyter notebooks.
 │
-├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc.
-│   └── figures        <- Generated graphics and figures to be used in reporting
-│
 ├── requirements.txt   <- The requirements file for the analysis environment, e.g.
 │                         generated with `pip freeze > requirements.txt`
 │
 ├── pyproject.toml     <- makes installable (pip install -e .) so src can be imported
-├── src                <- Source code for use in this project.
+│
+├── src/{{cookiecutter.project_slug}}                <- Source code for use in this project.
 │   ├── __init__.py    <- Makes src a Python module
 │   │
 │   ├── features       <- for engineering
-│   │    ├── etl       <- Scripts to transform data
-│   │    └──
 │   │
 │   ├── data           <- Scripts for data quality
-│   │    ├── quality
-│   │    └── visualization
 │   │
 │   ├── models         <- Scripts to train models and use them for predictions
-│   │    ├── MLOps
-│   │    └── autoML
 │   │
-│   └── visualization  <- Scripts to create exploratory and results oriented visualizations
-│       └── visualize.py
+│   └── utils
 │
 ├── tests               <- to test the functions
 |
@@ -120,15 +111,6 @@ and then
 make run_app_back
 ```
 
-f- Run the analysis of your data:
-
-d- Run the ETL
-
-Before running it, you can navigate to the transform file and add all the transformation you wish for each database. Root: ```src/{{ cookiecutter.package_name }}/features/etl/transform.py```
-
-```
-make run-etl
-```
 
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
 
