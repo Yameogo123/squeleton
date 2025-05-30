@@ -8,9 +8,11 @@ export default function HomeScreen() {
   const [user, setRefresh] = useMe();
   
   useRefresh(setRefresh);
+
+  const st = {flex: 1}
  
   return (
-    <View style={{flex: 1}}>
+    <View style={st}>
       {/* { 
         user?.role === "MEDECIN" ? <MedecinHome user={user} /> : user && <PatientHome user={user} />
       } */}

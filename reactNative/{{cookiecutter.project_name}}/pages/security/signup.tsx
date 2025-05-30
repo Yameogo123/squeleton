@@ -37,6 +37,8 @@ export default function RegisterScreen({ setAction }: ScreenProps) {
     const [respect, setRespect] = useState(false);
     const [identic, setIdentic] = useState(false);
     const [loading, setLoading] = useState(false);
+    const st = { flex: 1 };
+    const ani = {height: 140, width: 140, marginBottom: 40}
 
     useMemo(async () => {
 
@@ -49,14 +51,14 @@ export default function RegisterScreen({ setAction }: ScreenProps) {
     function LookModal(){
         return (
             <Modal visible={confirm} transparent animationType="slide" focusable>
-                <View style={{}}>
-                    <View style={{}}>
-                        <Text style={{}}>Aperçu des fichiers</Text>
+                <View>
+                    <View>
+                        <Text>Aperçu des fichiers</Text>
                         <ScrollView showsVerticalScrollIndicator={false}>
                         
                         </ScrollView>
-                        <TouchableOpacity style={{}} onPress={{}}>
-                            <Text style={{color: "white"}}>
+                        <TouchableOpacity>
+                            <Text>
                                 Fermer
                             </Text>
                         </TouchableOpacity>
@@ -76,14 +78,14 @@ export default function RegisterScreen({ setAction }: ScreenProps) {
 
     return (
         <KeyboardAvoidingView
-            style={{ flex: 1 }}
+            style={st}
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
             <ScrollView 
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={style_sigin.container} keyboardShouldPersistTaps="handled"
             >
-                <AnimatedLottieView source={require("../../assets/images/lotties/signup.json")} style={{height: 140, width: 140, marginBottom: 40}} autoPlay loop  />
+                <AnimatedLottieView source={require("../../assets/images/lotties/signup.json")} style={ani} autoPlay loop  />
                 
 
                 {/* Nom */}
@@ -152,7 +154,7 @@ export default function RegisterScreen({ setAction }: ScreenProps) {
 
                 {
                     !respect && 
-                    <Text style={{ color: 'red', fontSize: 12, marginTop: 4, marginBottom: 4 }}>doit avoir au moins une majuscule, un chiffre, un caractère spécial et de longeur supérieur à 8.</Text>
+                    <Text>doit avoir au moins une majuscule, un chiffre, un caractère spécial et de longeur supérieur à 8.</Text>
                     
                 }
 
@@ -171,7 +173,7 @@ export default function RegisterScreen({ setAction }: ScreenProps) {
 
                 {
                     !identic && 
-                    <Text style={{ color: 'red', fontSize: 12, marginTop: 6, marginBottom: 6 }}>Attention les mots de passe doivent bien correspondre</Text>
+                    <Text>Attention les mots de passe doivent bien correspondre</Text>
                     
                 }
 
@@ -187,7 +189,7 @@ export default function RegisterScreen({ setAction }: ScreenProps) {
                 </View> */}
 
                 {/* Sign Up Button */}
-                <TouchableOpacity style={style_sigin.signUpButton} onPress={{}} disabled={loading}>
+                <TouchableOpacity style={style_sigin.signUpButton} disabled={loading}>
                     <Text style={style_sigin.signUpText}>Créer</Text>
                 </TouchableOpacity>
 

@@ -15,6 +15,7 @@ SplashScreen.preventAutoHideAsync();
 
 export default function AppLayout() {
 
+  const options = { headerShown: false };
   const [loaded] = useFonts({
     SpaceMono: font,
   });
@@ -48,8 +49,7 @@ export default function AppLayout() {
   return (
     <ThemeProvider value={DefaultTheme}>
       <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        {/* <Stack.Screen name="chat" options={{ headerBackTitle: "retour"}} /> */}
+        <Stack.Screen name="(tabs)" options={options} />
       </Stack>
       <StatusBar barStyle="dark-content" translucent />
     </ThemeProvider>

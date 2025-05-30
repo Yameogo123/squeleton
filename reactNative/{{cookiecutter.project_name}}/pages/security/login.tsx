@@ -29,16 +29,19 @@ export default function LoginScreen({ setAction }: LoginScreenProps){
     const [pwd, setPwd] = useState("");
     const [show, setShow] = useState(true);
     const [loading, setLoading] = useState(false);
+    const st = { flex: 1 };
+    const img = {uri: "https://cdn-icons-png.flaticon.com/512/4140/4140047.png"}
 
     async function logMe(){
         setLoading(true);
+    
         setLoading(false);
     }
     
 
     return (
         <KeyboardAvoidingView
-            style={{ flex: 1 }}
+            style={st}
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
             <ScrollView
@@ -46,7 +49,7 @@ export default function LoginScreen({ setAction }: LoginScreenProps){
                 keyboardShouldPersistTaps="handled"
             >
                 <Image
-                    source={{uri: "https://cdn-icons-png.flaticon.com/512/4140/4140047.png"}} // Replace with your actual logo
+                    source={img} // Replace with your actual logo
                     style={style_login.logo}
                     resizeMode="contain"
                 />

@@ -17,7 +17,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.package.MedicalApp"
+      "package": "com.package.{{cookiecutter.project_slug}}"
     },
     "web": {
       "bundler": "metro",
@@ -47,9 +47,6 @@
     "extra": {
       "router": {
         "origin": false
-      },
-      "eas": {
-        "projectId": "6c849356-b652-4a58-8117-0d3bd2467775"
       }
     }
   }

@@ -7,19 +7,23 @@ import { app_color } from '@/assets/constantes/constante';
 
 export default function TabLayout() {
 
+  const screenOptions = {
+    tabBarActiveTintColor: app_color,
+    headerShown: false, //tabBarButton: HapticTab,
+    //tabBarBackground: TabBarBackground,
+    tabBarStyle: Platform.select({ ios: { position: 'absolute' }, default: {} }),
+  };
+
+  const options = {
+    title: 'home', tabBarIcon: ({ color }) => <Ionicons size={30} name="home" color={color} />,
+  }
+
   return (
     <>
       <Tabs
-        screenOptions={{
-          tabBarActiveTintColor: app_color,
-          headerShown: false, //tabBarButton: HapticTab,
-          //tabBarBackground: TabBarBackground,
-          tabBarStyle: Platform.select({ ios: {position: 'absolute'}, default: {}}),
-        }}>
+        screenOptions={screenOptions}>
         <Tabs.Screen name="index"
-          options={{
-            title: 'home', tabBarIcon: ({ color }) => <Ionicons size={30} name="home" color={color} />,
-          }}
+          options={options}
         />
       </Tabs>
       <StatusBar barStyle="dark-content" translucent  />

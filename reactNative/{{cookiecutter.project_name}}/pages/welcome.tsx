@@ -12,8 +12,10 @@ type WelcomeScreenProps = {
 
 export default function WelcomeScreen({ setAction }: WelcomeScreenProps) {
 
+  const st = { flex: 1 };
+
   return (
-    <View style={{flex: 1}}>
+    <View style={st}>
       <TouchableOpacity onPress={() => setAction('login')}>
         <Text>commencer</Text>
       </TouchableOpacity>
