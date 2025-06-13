@@ -15,7 +15,9 @@ export default function TabLayout() {
   };
 
   const options = {
-    title: 'home', tabBarIcon: ({ color }) => <Ionicons size={30} name="home" color={color} />,
+      title: 'home',
+      tabBarIcon: ({ color }: { color: string }) => <Ionicons size={25} name="home" color={color} />,
+    }
   }
 
   return (
@@ -23,12 +25,7 @@ export default function TabLayout() {
       <Tabs
         screenOptions={screenOptions}>
         <Tabs.Screen name="(home)"
-          options={
-            {
-              title: 'home',
-              tabBarIcon: ({ color }: { color: string }) => <Ionicons size={25} name="home" color={color} />,
-            }
-          }
+          options={options}
         />
       </Tabs>
       <StatusBar barStyle="dark-content" translucent  />
