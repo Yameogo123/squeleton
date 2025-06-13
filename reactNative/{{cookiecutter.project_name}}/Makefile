@@ -64,9 +64,12 @@ clean-node:
 		echo "$(ccso)--> ❌ NVM not found. Please install nvm first. $(ccend)"; \
 	fi
 
+install-tsconf:
+	npx tsc --init --esModuleInterop
+
 
 # 1 + 2 + 3 + 4 - Default target: Runs all necessary steps in sequence
-all-install: install-nvm install-node use-node install-packages
+all-install: install-nvm install-node use-node install-packages install-tsconf
 
 # to launch the script
 run: 
