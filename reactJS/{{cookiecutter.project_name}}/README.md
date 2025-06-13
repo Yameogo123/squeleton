@@ -12,14 +12,8 @@ NB: Maybe the dependancies in ```package.json``` will be old. Do not hesitate to
 - you need, of course, to install node (and npm) on your computer.
 - you need then to install cookiecutter `npm install cookiecutter` or through python `pip install cookiecutter`
 
-#### 2. project initialization
 
-```
-cookiecutter https://github.com/Yameogo123/xxxxx
-```
-
-
-#### 3. the squeleton 
+#### 2. the squeleton 
 
 ```
 ---

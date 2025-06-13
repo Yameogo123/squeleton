@@ -22,8 +22,13 @@ export default function TabLayout() {
     <>
       <Tabs
         screenOptions={screenOptions}>
-        <Tabs.Screen name="index"
-          options={options}
+        <Tabs.Screen name="(home)"
+          options={
+            {
+              title: 'home',
+              tabBarIcon: ({ color }: { color: string }) => <Ionicons size={25} name="home" color={color} />,
+            }
+          }
         />
       </Tabs>
       <StatusBar barStyle="dark-content" translucent  />

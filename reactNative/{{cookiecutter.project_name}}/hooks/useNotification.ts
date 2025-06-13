@@ -3,6 +3,7 @@ import { Platform } from 'react-native';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
+import { useSession } from './ctx';
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -13,7 +14,7 @@ Notifications.setNotificationHandler({
 });
 
 function handleRegistrationError(errorMessage: string) {
-    alert(errorMessage);
+    //alert(errorMessage);
     throw new Error(errorMessage);
 }
 
@@ -48,7 +49,7 @@ async function registerForPushNotificationsAsync() {
                     projectId,
                 })
             ).data;
-            console.log(pushTokenString);
+            
             return pushTokenString;
         } catch (e: unknown) {
             handleRegistrationError(`${e}`);
@@ -65,10 +66,11 @@ export function useNotification(){
     const [notification, setNotification] = useState<Notifications.Notification | undefined>(undefined);
     const notificationListener = useRef<Notifications.EventSubscription>();
     const responseListener = useRef<Notifications.EventSubscription>();
+    const { updateSession } = useSession();
 
     useEffect(() => {
         registerForPushNotificationsAsync()
-        .then(token => setExpoPushToken(token ?? ''))
+        .then(token => {setExpoPushToken(token ?? ''); updateSession('expoToken', token ?? ''); })
         .catch((error: any) => setExpoPushToken(`${error}`));
 
         notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
