@@ -12,7 +12,7 @@ import { StatusBar } from 'expo-status-bar';
 export default function SignIn(){
 
     const [action, setAction] = useState('welcome');
-    const st = {flex: 1, backgroundColor: "white"}
+    const st = {flex: 1}
     return (
         <SafeAreaView style={st}>
             {
