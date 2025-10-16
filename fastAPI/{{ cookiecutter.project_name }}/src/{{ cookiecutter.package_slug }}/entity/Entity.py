@@ -21,11 +21,23 @@ class Entity:
     def saveModel(self, document):
         return make_crud_action(self.__model_name, "insert_one", document= document)
     
+    def saveAllModel(self, documents):
+        return make_crud_action(self.__model_name, "insert_many", documents= documents)
+
     def updateModel(self, filter, update):
         return make_crud_action(self.__model_name, "update_one", filter = filter, update = {"$set": update})
     
+    def pushUpdateModel(self, filter, update):
+        return make_crud_action(self.__model_name, "update_one", filter = filter, update = {"$addToSet": update})
+    
+    def pullUpdateModel(self, filter, update):
+        return make_crud_action(self.__model_name, "update_one", filter = filter, update = {"$pull": update})
+    
     def deleteModel(self, filter):
         return make_crud_action(self.__model_name, "delete_one", filter = filter)
+    
+    def purgeModel(self, filter= {}):
+        return make_crud_action(self.__model_name, "purge", filter = filter)
     
     def getModel(self, filter):
         return serialize_model(make_crud_action(self.__model_name, "find_one", filter = filter))

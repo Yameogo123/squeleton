@@ -1,16 +1,12 @@
 
 export TERM := xterm
 
-# Variables
-DOCKER_COMPOSE = docker-compose
-MONGO_SERVICE = mongo
-
 PROJECT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 PROJECT_NAME = {{ cookiecutter.project_name }}
 PACKAGE_NAME = {{ cookiecutter.package_slug }}
 PYTHON_INTERPRETER = python3
 PYTHON_VERSION = {{ cookiecutter.python_version }}
-
+PORT= 3000
 
 VENV = venv
 PYTHON = $(VENV)/bin/python
@@ -133,68 +129,11 @@ delete_pyenv_env:
 # Default target
 all: build
 
-# Build all Docker services
-dk-build:
-	@echo "Building Docker images..."
-	$(DOCKER_COMPOSE) build
-
-# Start all services in detached mode
-dk-up:
-	@echo "Starting services..."
-	$(DOCKER_COMPOSE) up -d
-
-# Stop all services
-dk-down:
-	@echo "Stopping services..."
-	$(DOCKER_COMPOSE) down
-
-# Restart all services
-dk-restart: dk-down dk-up
-
-# View logs for all services
-logs:
-	@echo "Showing logs..."
-	$(DOCKER_COMPOSE) logs -f
-
-# View logs for a specific service (e.g., make logs-backend)
-logs-%:
-	@echo "Showing logs for $*..."
-	$(DOCKER_COMPOSE) logs -f $*
-
-# Access the backend container shell
-backend-shell:
-	@echo "Accessing backend container shell..."
-	$(DOCKER_COMPOSE) exec $(BACKEND_SERVICE) /bin/bash
-
-# Access the frontend container shell
-frontend-shell:
-	@echo "Accessing frontend container shell..."
-	$(DOCKER_COMPOSE) exec $(FRONTEND_SERVICE) /bin/bash
-
-# Access the MongoDB container shell
-mongo-shell:
-	@echo "Accessing MongoDB container shell..."
-	$(DOCKER_COMPOSE) exec $(MONGO_SERVICE) mongosh -u root -p example
-
-# Clean up Docker resources (containers, networks, volumes)
-dk-clean:
-	@echo "Cleaning up Docker resources..."
-	$(DOCKER_COMPOSE) down --volumes --remove-orphans
 
 # Help command to list all available targets
 help:
 	@echo "Available targets:"
-	@echo "  dk-build         - Build all Docker images"
-	@echo "  dk-up            - Start all services in detached mode"
-	@echo "  dk-down          - Stop all services"
-	@echo "  restart       - Restart all services"
-	@echo "  logs          - View logs for all services"
-	@echo "  logs-<service> - View logs for a specific service (e.g., logs-backend)"
-	@echo "  backend-shell - Access the backend container shell"
-	@echo "  frontend-shell - Access the frontend container shell"
-	@echo "  mongo-shell   - Access the MongoDB container shell"
-	@echo "  dk-clean         - Clean up Docker resources (containers, networks, volumes)"
 	@echo "  help          - Show this help message"
 
 # Default target
-.PHONY: all build up down restart logs logs-% backend-shell frontend-shell mongo-shell clean help
+.PHONY: all help

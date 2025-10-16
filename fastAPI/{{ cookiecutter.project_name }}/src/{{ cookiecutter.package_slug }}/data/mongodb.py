@@ -20,13 +20,15 @@ userdb = dbname["user"]
 roledb = dbname["role"]
 
 userdb.create_index("email", unique=True)
-roledb.create_index("libelle", unique=True)
 
 tables = {
-    "user": userdb, "role": roledb
+    "user": userdb
 }
 
-actions = ["insert_one", "delete_one", "find_one", "update_one", "find_all"]
+actions = [
+    "insert_one", "delete_one", "find_one", "update_one", "find_all",
+    "purge", "insert_many"
+]
 
 
 
@@ -37,7 +39,8 @@ def make_crud_action(tablename:str, action:str, **kwargs):
     fonctions = {
         "insert_one": db_table.insert_one, "find_one": db_table.find_one,
         "update_one": db_table.update_one, "delete_one": db_table.delete_one,
-        "find_all": db_table.find
+        "find_all": db_table.find, "purge": db_table.delete_many,
+        "insert_many": db_table.insert_many
     }
     return fonctions[action](**kwargs)
 

@@ -8,7 +8,7 @@ from decouple import config
 
 JWT_SECRET = config("SECRET_KEY")
 JWT_ALGORITHM = config("ALGORITHM")
-EXPIRY = int(config("ACCESS_TOKEN_EXPIRE_MINUTES"))
+EXPIRY = int(config("ACCESS_TOKEN_EXPIRE_MINUTES")) * 60
 
 
 def token_response(access_token:str):

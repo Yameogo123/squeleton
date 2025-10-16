@@ -69,13 +69,14 @@ check the MakeFile
 │    │   ├── entity         <- all the entities of UML
 │    │   │    ├── Entity.py <- abstract class that will be used in the others
 │    │   │    └── *
+│    │   ├── router         <- handle all fast API routers
 │    │   ├── middleware     <- handle all fast API middleware
 │    │   ├── models         <- ML, DL  LLM models
 │    │   │
 │    │   └── utils          <- controller and utils (useful functions)
 |    |
-│    └── main_script.py
+│    └── 
 |
-└── docker-compose.yaml     <- to dockerize back end
+└── 
 ---
 ```

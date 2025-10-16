@@ -15,9 +15,8 @@ export default function TabLayout() {
   };
 
   const options = {
-      title: 'home',
-      tabBarIcon: ({ color }: { color: string }) => <Ionicons size={25} name="home" color={color} />,
-    }
+    title: 'home',
+    tabBarIcon: ({ color }: { color: string }) => <Ionicons size={25} name="home" color={color} />,
   }
 
   return (
