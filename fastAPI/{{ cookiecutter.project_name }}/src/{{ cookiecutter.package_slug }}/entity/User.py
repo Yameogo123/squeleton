@@ -1,6 +1,6 @@
 
 from fastapi import HTTPException
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 from {{ cookiecutter.package_slug }}.entity.Entity import Entity
 from {{ cookiecutter.package_slug }}.utils.controller import hash_pwd, verify_password
 
@@ -8,10 +8,10 @@ from {{ cookiecutter.package_slug }}.utils.controller import hash_pwd, verify_pa
 class UserModel(BaseModel):
     nom: str = ""
     prenom : str = ""
-    email: EmailStr = ""
+    email: str = ""
     tel: str = ""
     password: str = ""
-    role_id: str = ""
+    role: str = ""
     specialite_id: str = ""
     cabinet_id: str = ""
     profil: str = ""
