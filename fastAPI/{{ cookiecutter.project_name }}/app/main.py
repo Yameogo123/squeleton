@@ -3,12 +3,9 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from bson.objectid import ObjectId
-from loguru import logger
-
 from pathlib import Path
 
-from {{ cookiecutter.package_slug }}.middleware.middleware import signJWT, JWTBearer
+
 from {{ cookiecutter.package_slug }}.router.r_file import r_file
 from {{ cookiecutter.package_slug }}.router.r_user import r_user
 from {{ cookiecutter.package_slug }}.utils.scheduling import scheduler, add_jobs

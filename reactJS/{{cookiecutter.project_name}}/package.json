@@ -1,5 +1,5 @@
 {
-  "homepage": "/",
+  "homepage": "",
   "name": "{{cookiecutter.project_slug}}",
   "version": "{{cookiecutter.version}}",
   "description": "{{cookiecutter.description}}",
@@ -11,6 +11,7 @@
     "ajv": "^8.17.1",
     "bootstrap": "^5.3.3",
     "lodash.throttle": "^4.1.1",
+    "lucide-react": "^0.554.0",
     "make": "^0.8.1",
     "moment": "^2.30.1",
     "react": "^19.0.0",
