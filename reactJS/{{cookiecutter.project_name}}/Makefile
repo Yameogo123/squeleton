@@ -73,3 +73,10 @@ run:
 	@echo "$(ccso)--> Running the script $(ccend)"
 	npm start
 
+
+git-push:
+	@echo "Enter commit message:"
+	@read -p "Message: " msg; \
+	git add .; \
+	git commit -m "$$msg"; \
+	git push
