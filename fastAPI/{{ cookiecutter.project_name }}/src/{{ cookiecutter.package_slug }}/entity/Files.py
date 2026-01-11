@@ -1,13 +1,10 @@
 
-from pydantic import BaseModel
 from {{ cookiecutter.package_slug }}.entity.Entity import Entity
 import io
+from bson.objectid import ObjectId
 from fastapi.responses import StreamingResponse
-
-class DocumentModel(BaseModel):
-    libelle: str
-    description: str
-    file_id: str = ""
+from loguru import logger
+from typing import List
 
 
 
@@ -50,7 +47,7 @@ class Files(Entity):
             file = self.getFileById(self.getId())
             image_stream = io.BytesIO(file.read())
             if image_stream:
-                return StreamingResponse(image_stream)
+                return StreamingResponse(image_stream, headers={"Content-Disposition": "inline"})
         return None
     
     def download(self):
@@ -61,3 +58,24 @@ class Files(Entity):
                 headers={"Content-Disposition": f"attachment; filename={file_data.filename}"}
             )
         return None
+    
+    async def deleteGroup(self, ids:List[str]):
+        try:
+            for _id in ids:
+                await self.deleteFile(ObjectId(_id))
+        except Exception as e:
+            logger.error(f"erreur: {e}")
+
+    
+    async def deleteAllOfUser(self, userId):
+        from med_backend.entity.User import User
+        try:
+            userMD = User()
+            user = userMD.get_by_id(ObjectId(userId))
+            profile = user.get("profil", "")
+            if profile:
+                return await self.deleteFile(profile)
+            return None
+        except Exception as e:
+            logger.error(e)
+            return None
