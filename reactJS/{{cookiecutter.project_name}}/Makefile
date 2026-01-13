@@ -80,3 +80,10 @@ git-push:
 	git add .; \
 	git commit -m "$$msg"; \
 	git push
+
+firebase-deploy:
+	@echo "$(ccso)--> Deploying to Firebase Hosting... $(ccend)"
+	\. "$(NVM_DIR)/nvm.sh" && nvm use 20 && \
+	npm run build && \
+	npm install -g firebase-tools && \
+	firebase deploy --only hosting:xxxxx

@@ -126,14 +126,30 @@ delete_pyenv_env:
 	@echo "Fichier $(TEMPLATE_FILE) créé avec succès"
 
 
+git-push:
+	@echo "Enter commit message:"
+	@read -p "Message: " msg; \
+	git add .; \
+	git commit -m "$$msg"; \
+	git push
+
+git-publish: git-push
+	@echo "$(ccso)--> Publish the package to PyPI$(ccend)"
+	git push git@git.evennode.com:xxxxx.com dev:master
+	git push origin dev
+
 # Default target
-all: build
+all: pyenv_env run-app git-push git-publish
 
 
 # Help command to list all available targets
 help:
 	@echo "Available targets:"
 	@echo "  help          - Show this help message"
+	@echo "  pyenv_env     - Create environnement with pyenv"
+	@echo "  run-app       - launch uvicorn app"
+	@echo "  git-push      - push all to current git branch"
+	@echo "  git-publish   - push to evennode"
 
 # Default target
 .PHONY: all help

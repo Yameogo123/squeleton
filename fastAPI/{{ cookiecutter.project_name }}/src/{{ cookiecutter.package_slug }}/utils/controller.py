@@ -5,9 +5,14 @@ from passlib.context import CryptContext
 from fastapi import HTTPException
 from loguru import logger
 import httpx
+from decouple import config
+from cryptography.fernet import Fernet
 
 # Password hashing setup
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+FERNET_KEY = config("FERNET_KEY").encode()
+fernet = Fernet(FERNET_KEY)
 
 def from_model_to_dict(model):
     return json.loads(model.json())
@@ -46,3 +51,21 @@ def send_push_notification(expo_token: str, title: str, body: str, data: dict = 
     with httpx.Client() as client:
         response = client.post(EXPO_PUSH_URL, json=message, data = message)
         return response.json()
+
+def encrypt_text(text:str):
+    try:
+        if isinstance(text, bytes):
+            return text
+        return fernet.encrypt(text.encode('utf-8'))
+    except Exception as e:
+        logger.error(f'error: {e}')
+        return text
+
+def decrypt_text(token):
+    try:
+        if not isinstance(token, bytes):
+            return token
+        return fernet.decrypt(token).decode('ascii')
+    except Exception as e:
+        logger.error(f'error: {e}')
+        return token

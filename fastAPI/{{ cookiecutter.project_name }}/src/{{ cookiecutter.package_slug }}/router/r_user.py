@@ -19,7 +19,7 @@ async def login(user_info:UserModel):
     try:
         model = User()
         model.load(user_info)
-        db_user = model.login()
+        db_user = model.loginEmail()
         if db_user is None:
             http_error("Mauvaises données apportées!", 400) 
         if not db_user["actif"]:
@@ -35,7 +35,7 @@ async def login2(user_info:UserModel):
     try:
         model = User()
         model.load(user_info)
-        db_user = model.login2()
+        db_user = model.loginTel()
         if db_user == -1 or db_user == -2:
             http_error("Mauvaises données saisies!", 400) 
         if not db_user["actif"]:
