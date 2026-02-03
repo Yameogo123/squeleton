@@ -52,9 +52,6 @@ cookiecutter https://github.com/Yameogo123/squeleton.git --directory="reactJS"
 ### 4. 📱 React Native Project
 *Coming soon*
 
-```bash
-cookiecutter https://github.com/Yameogo123/squeleton.git --directory="reactNative"
-```
 
 ---
 
