@@ -1,93 +1,73 @@
-import { useState, useEffect, useRef } from 'react';
-import { Platform } from 'react-native';
-import * as Device from 'expo-device';
+import { useState, useRef } from 'react';
 import * as Notifications from 'expo-notifications';
-import Constants from 'expo-constants';
-import { useSession } from './ctx';
+//import { useSession } from './ctx';
+import { useFocusEffect } from '@react-navigation/native';
+import { updateExpoToken } from '@/API/controller.utils';
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
         shouldShowAlert: true,
         shouldPlaySound: true,
         shouldSetBadge: true,
+        shouldShowBanner: true,
+        shouldShowList: true,
     }),
 });
 
-function handleRegistrationError(errorMessage: string) {
-    //alert(errorMessage);
-    throw new Error(errorMessage);
-}
 
-async function registerForPushNotificationsAsync() {
-    if (Platform.OS === 'android') {
-        Notifications.setNotificationChannelAsync('default', {
-            name: 'default',
-            importance: Notifications.AndroidImportance.MAX,
-            vibrationPattern: [0, 250, 250, 250],
-            lightColor: '#FF231F7C',
-        });
-    }
+export function useNotification(userId?: string, tok?: string, existant_token:string = '', setRefresh?: any) {
+    const [notification, setNotification] = useState<Notifications.Notification | undefined>(undefined);
+    const notificationListener = useRef<Notifications.EventSubscription | null>(null);
+    const responseListener = useRef<Notifications.EventSubscription | null>(null);
 
-    if (Device.isDevice) {
+    async function registerForPushNotificationsAsync() {
         const { status: existingStatus } = await Notifications.getPermissionsAsync();
         let finalStatus = existingStatus;
-        if (existingStatus !== 'granted') {
+
+        if (existingStatus !== "granted") {
             const { status } = await Notifications.requestPermissionsAsync();
             finalStatus = status;
         }
-        if (finalStatus !== 'granted') {
-            handleRegistrationError('Permission not granted to get push token for push notification!');
-            return;
+
+        if (finalStatus !== "granted") {
+            return null;
         }
-        const projectId = Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
-        if (!projectId) {
-            handleRegistrationError('Project ID not found');
-        }
-        try {
-            const pushTokenString = (
-                await Notifications.getExpoPushTokenAsync({
-                    projectId,
-                })
-            ).data;
-            
-            return pushTokenString;
-        } catch (e: unknown) {
-            handleRegistrationError(`${e}`);
-        }
-    } else {
-        handleRegistrationError('Must use physical device for push notifications');
+
+        const token = (await Notifications.getExpoPushTokenAsync()).data;
+        return token;
     }
-}
 
+    useFocusEffect(() => {
+        let isActive = true;
 
-
-export function useNotification(){
-    const [expoPushToken, setExpoPushToken] = useState('');
-    const [notification, setNotification] = useState<Notifications.Notification | undefined>(undefined);
-    const notificationListener = useRef<Notifications.EventSubscription>();
-    const responseListener = useRef<Notifications.EventSubscription>();
-    const { updateSession } = useSession();
-
-    useEffect(() => {
         registerForPushNotificationsAsync()
-        .then(token => {setExpoPushToken(token ?? ''); updateSession('expoToken', token ?? ''); })
-        .catch((error: any) => setExpoPushToken(`${error}`));
+        .then(expo_token => {
+            //updateExpoToken(token, userId, tok); // store token in backend
+            if (isActive && expo_token) {
+                if(existant_token !== expo_token){
+                    updateExpoToken(expo_token, userId, tok); 
+                }
+            }
+        })
+        .catch(err => {
+            
+        });
 
-        notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-            setNotification(notification);
+        notificationListener.current = Notifications.addNotificationReceivedListener(notif => {
+            if (isActive) setNotification(notif);
+            setRefresh(Math.random()); 
         });
 
         responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-            console.log(response);
+            setRefresh(Math.random()); 
         });
 
         return () => {
-            notificationListener.current &&
-                Notifications.removeNotificationSubscription(notificationListener.current);
-            responseListener.current &&
-                Notifications.removeNotificationSubscription(responseListener.current);
+            isActive = false;
+            notificationListener.current?.remove();
+            responseListener.current?.remove();
         };
-    }, []);
+    });
 
-    return notification
+    return notification;
 }

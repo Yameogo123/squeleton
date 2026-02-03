@@ -54,10 +54,14 @@ class User(Entity):
         self.__nom = encrypt_text(self.__entite["nom"])
         self.__prenom = encrypt_text(self.__entite["prenom"])
         self.__email = encrypt_text(self.__entite["email"])
+        self.__tel = self.__entite["tel"]
         self.__password = self.__entite["password"]
     
     def save(self):
         if self.__entite:
+            user_tel = self.getModel({"tel": self.__tel})
+            if user_tel:
+                return 0
             if self.validate_password(self.__entite["password"]):
                 now = datetime.now()
                 current = now.strftime("%Y-%m-%d")
@@ -109,7 +113,7 @@ class User(Entity):
         return self.__login(user)
     
     def loginTel(self):
-        user = self.getModel({"tel": decrypt_text(self.__tel)})
+        user = self.getModel({"tel": self.__tel})
         return self.__login(user)
     
     def updatePassword(self, id:str, old_password:str, new_password:str):
@@ -122,7 +126,7 @@ class User(Entity):
             return None
     
     def updatePassword2(self, info:UserPwd2Model):
-        user = self.getModel({'nom': encrypt_text(info.nom), 'prenom': encrypt_text(info.prenom), "tel": encrypt_text(info.tel)})
+        user = self.getModel({'nom': encrypt_text(info.nom), 'prenom': encrypt_text(info.prenom), "tel": info.tel})
         if not user:
             return 0
         else:
@@ -135,7 +139,7 @@ class User(Entity):
     def updateTel(self, id:str, tel:str):
         user = self.getModel(ObjectId(id))
         if user:
-            return self.updateModel({"_id": self.getId()}, {"tel": encrypt_text(tel), "last_tel_update": self.__current})
+            return self.updateModel({"_id": self.getId()}, {"tel": tel, "last_tel_update": self.__current})
         return None
     
     def updateProfil(self, profil:str):

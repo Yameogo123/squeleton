@@ -27,7 +27,7 @@ tables = {
 
 actions = [
     "insert_one", "delete_one", "find_one", "update_one", "find_all",
-    "purge", "insert_many"
+    "purge", "insert_many", "update_many"
 ]
 
 
@@ -40,7 +40,7 @@ def make_crud_action(tablename:str, action:str, **kwargs):
         "insert_one": db_table.insert_one, "find_one": db_table.find_one,
         "update_one": db_table.update_one, "delete_one": db_table.delete_one,
         "find_all": db_table.find, "purge": db_table.delete_many,
-        "insert_many": db_table.insert_many
+        "insert_many": db_table.insert_many, "update_many": db_table.update_many
     }
     return fonctions[action](**kwargs)
 

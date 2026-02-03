@@ -23,6 +23,9 @@ class Entity:
     
     def saveAllModel(self, documents):
         return make_crud_action(self.__model_name, "insert_many", documents= documents)
+    
+    def updateModels(self, filter, update):
+        return make_crud_action(self.__model_name, "update_many", filter = filter, update = {"$set": update})
 
     def updateModel(self, filter, update):
         return make_crud_action(self.__model_name, "update_one", filter = filter, update = {"$set": update})
