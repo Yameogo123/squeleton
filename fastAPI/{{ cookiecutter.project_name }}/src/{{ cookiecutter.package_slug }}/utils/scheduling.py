@@ -11,9 +11,9 @@ jobstores = {
     'default': MemoryJobStore()
 }
 job_defaults = {
-    'coalesce': True,  # Combine les exécutions manquées en une seule
-    'max_instances': 1,  # Une seule instance du job à la fois
-    'misfire_grace_time': 15  # Grace period de 15 secondes
+    'coalesce': True,
+    'max_instances': 1,
+    'misfire_grace_time': 15
 }
 
 scheduler = BackgroundScheduler(

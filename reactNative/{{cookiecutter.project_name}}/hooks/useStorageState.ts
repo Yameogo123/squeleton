@@ -1,6 +1,7 @@
 import  { useEffect, useCallback, useReducer, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type UseStateHook<T> = [[boolean, T | null], (value: T | null) => void];
 
@@ -30,6 +31,34 @@ export async function setStorageItemAsync(key: string, value: string | null) {
         } else {
             await SecureStore.setItemAsync(key, value);
         }
+    }
+}
+
+
+export async function getStorageItemAsync(key: string) {
+    if (Platform.OS === 'web') {
+        try {
+            return localStorage.getItem(key);
+        } catch (e) {
+            console.error('Local storage is unavailable:', e);
+            return ''
+        }
+    } else {
+        return await SecureStore.getItemAsync(key);
+    }
+}
+
+
+export function getStorageItem(key: string) {
+    if (Platform.OS === 'web') {
+        try {
+            return localStorage.getItem(key);
+        } catch (e) {
+            console.error('Local storage is unavailable:', e);
+            return ''
+        }
+    } else {
+        return SecureStore.getItem(key);
     }
 }
 
@@ -91,3 +120,41 @@ export function getSessionInfo(){
     return state;
 
 }
+
+
+export const BiometricStorage = {
+    // Store phone number securely
+    setStoredTel: async (tel: string) => {
+        await SecureStore.setItemAsync('biometric_tel', tel);
+    },
+
+    getStoredTel: async (): Promise<string | null> => {
+        return await SecureStore.getItemAsync('biometric_tel');
+    },
+
+    // Store password securely
+    setStoredPwd: async (pwd: string) => {
+        await SecureStore.setItemAsync('biometric_pwd', pwd);
+    },
+
+    getStoredPwd: async (): Promise<string | null> => {
+        return await SecureStore.getItemAsync('biometric_pwd');
+    },
+
+    // Enable/disable biometric login
+    setBiometricEnabled: async (enabled: boolean) => {
+        await SecureStore.setItemAsync('biometric_enabled', JSON.stringify(enabled));
+    },
+
+    getBiometricEnabled: async (): Promise<boolean> => {
+        const value = await SecureStore.getItemAsync('biometric_enabled');
+        return value ? JSON.parse(value) : false;
+    },
+
+    // Clear all biometric data (for logout)
+    clearBiometricData: async () => {
+        await SecureStore.deleteItemAsync('biometric_tel');
+        await SecureStore.deleteItemAsync('biometric_pwd');
+        await SecureStore.deleteItemAsync('biometric_enabled');
+    },
+};

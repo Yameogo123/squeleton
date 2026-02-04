@@ -28,4 +28,5 @@ export type sessionType = {
     userId?: string;
     token?: string;
     expoToken?: string;
+    expireAt?: string;
 }
