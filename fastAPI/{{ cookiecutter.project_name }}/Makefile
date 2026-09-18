@@ -27,6 +27,10 @@ run-app:
 	@echo "--> Starting FastAPI"
 	$(PYTHON_INTERPRETER) -m uvicorn app.main:app --port $(PORT)
 
+run-test:
+	@echo "--> Starting FastAPI (dev, hot-reload) using uv"
+	uv run uvicorn app.main:app --reload
+
 
 venv:
 	@echo "--> Creating virtual environment"
@@ -75,12 +79,11 @@ clean:
 
 dev-install:
 	@echo "$(ccso) --> Install Python Dependencies (DEV)$(ccend)"
-	$(PYTHON_INTERPRETER) -m pip install uv
-	$(PYTHON_INTERPRETER) -m uv pip install -U pip setuptools wheel
-	$(PYTHON_INTERPRETER) -m uv pip install --upgrade pip
-	$(PYTHON_INTERPRETER) -m uv pip install -r requirements-dev.txt
-	$(PYTHON_INTERPRETER) -m uv pip install -r requirements.txt
-	$(PYTHON_INTERPRETER) -m uv pip install -e .
+	uv pip install -U pip setuptools wheel
+	uv pip install -r requirements-dev.txt
+	uv pip install -r requirements.txt
+	uv pip install -e .
+
 
 prod-install:
 	@echo "$(ccso) --> Install Python Dependencies (PROD)$(ccend)"

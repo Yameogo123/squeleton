@@ -1,4 +1,3 @@
-
 from fastapi import HTTPException
 from pydantic import BaseModel
 from {{ cookiecutter.package_slug }}.entity.Entity import Entity
@@ -41,10 +40,11 @@ class User(Entity):
 
     def __user_decrypt(self, user):
         try:
-            user["nom"] = decrypt_text(user["nom"])
-            user["prenom"] = decrypt_text(user["prenom"])
-            user["email"] = decrypt_text(user["email"])
-            user["adresse"] = decrypt_text(user["adresse"])
+            if user:
+                user["nom"] = decrypt_text(user["nom"])
+                user["prenom"] = decrypt_text(user["prenom"])
+                user["email"] = decrypt_text(user["email"])
+                user["adresse"] = decrypt_text(user.get("adresse", ""))
         except Exception as e:
             logger.error(f"erreur: {e}")
         return user
@@ -57,9 +57,9 @@ class User(Entity):
         self.__tel = self.__entite["tel"]
         self.__password = self.__entite["password"]
     
-    def save(self):
+    async def save(self):
         if self.__entite:
-            user_tel = self.getModel({"tel": self.__tel})
+            user_tel = await self.getModel({"tel": self.__tel})
             if user_tel:
                 return 0
             if self.validate_password(self.__entite["password"]):
@@ -70,27 +70,28 @@ class User(Entity):
                 self.__entite['nom'] = self.__nom
                 self.__entite['prenom'] = self.__prenom
                 self.__entite['email'] = self.__email
-                return self.saveModel(self.__entite)
+                return await self.saveModel(self.__entite)
         return None
     
-    def delete(self):
+    async def delete(self):
         if self.getId() :
-            return self.deleteModel({"_id": self.getId()})
+            return await self.deleteModel({"_id": self.getId()})
         return None
     
-    def update(self):
+    async def update(self):
         updt = {"nom": self.__nom, "prenom": self.__prenom}
         isValid = all(updt.values())
         if self.getId() and isValid:
-            return self.updateModel({"_id": self.getId()}, updt)
+            return await self.updateModel({"_id": self.getId()}, updt)
         else:
             return None
     
-    def getById(self, id):
-        return self.__user_decrypt(self.getModel({"_id": id}))
+    async def getById(self, id):
+        user = await self.getModel({"_id": id})
+        return self.__user_decrypt(user) if user else None
     
-    def getAll(self):
-        models = self.getModels()
+    async def getAll(self):
+        models = await self.getModels()
         users = []
         for x in models:
             users.append(self.__user_decrypt(x))
@@ -100,7 +101,7 @@ class User(Entity):
         if user:
             isgoodpwd = verify_password(self.__password, user["password"])
             if isgoodpwd:
-                if not user["active"]:
+                if not user.get("actif", True):
                     return None
                 user["password"] = ""
                 return user
@@ -108,55 +109,62 @@ class User(Entity):
         else:
             return None
     
-    def loginEmail(self):
-        user = self.getModel({"email": decrypt_text(self.__email)})
+    async def loginEmail(self):
+        user = await self.getModel({"email": decrypt_text(self.__email)})
         return self.__login(user)
     
-    def loginTel(self):
-        user = self.getModel({"tel": self.__tel})
+    async def loginTel(self):
+        user = await self.getModel({"tel": self.__tel})
         return self.__login(user)
     
-    def updatePassword(self, id:str, old_password:str, new_password:str):
-        user = self.getById(id)
-        isgoodpwd = verify_password(old_password, user["password"])
-        if isgoodpwd:
-            passw = self.validate_password(new_password)
-            return self.updateModel({"_id":id}, {"password": hash_pwd(passw), "last_pwd_update": self.__current})
-        else:
-            return None
+    async def updatePassword(self, id:str, old_password:str, new_password:str):
+        user = await self.getById(id)
+        if user:
+            isgoodpwd = verify_password(old_password, user["password"])
+            if isgoodpwd:
+                passw = self.validate_password(new_password)
+                return await self.updateModel({"_id":id}, {"password": hash_pwd(passw), "last_pwd_update": self.__current})
+        return None
     
-    def updatePassword2(self, info:UserPwd2Model):
-        user = self.getModel({'nom': encrypt_text(info.nom), 'prenom': encrypt_text(info.prenom), "tel": info.tel})
+    async def updatePassword2(self, info:UserPwd2Model):
+        user = await self.getModel({'nom': encrypt_text(info.nom), 'prenom': encrypt_text(info.prenom), "tel": info.tel})
         if not user:
             return 0
         else:
             try:
                 passw = self.validate_password(info.password)
-                return self.updateModel({"_id": ObjectId(user["_id"])}, {"password": hash_pwd(passw), "last_pwd_update": self.__current})
+                return await self.updateModel({"_id": ObjectId(user["_id"])}, {"password": hash_pwd(passw), "last_pwd_update": self.__current})
             except Exception:
                 return 1
     
-    def updateTel(self, id:str, tel:str):
-        user = self.getModel(ObjectId(id))
+    async def updateTel(self, id:str, tel:str):
+        user = await self.getModel({"_id": ObjectId(id)})
         if user:
-            return self.updateModel({"_id": self.getId()}, {"tel": tel, "last_tel_update": self.__current})
+            return await self.updateModel({"_id": self.getId()}, {"tel": tel, "last_tel_update": self.__current})
         return None
     
-    def updateProfil(self, profil:str):
+    async def updateProfil(self, profil:str):
         updt = {"profil": profil}
         if self.getId():
-            return self.updateModel({"_id": self.getId()}, updt)
+            return await self.updateModel({"_id": self.getId()}, updt)
+        else:
+            return None
+            
+    async def updateCNI(self, cni:str):
+        updt = {"cni": cni}
+        if self.getId():
+            return await self.updateModel({"_id": self.getId()}, updt)
         else:
             return None
     
-    def updateExpoToken(self, expoToken:str):
+    async def updateExpoToken(self, expoToken:str):
         if self.getId():
-            return self.updateModel({"_id": self.getId()}, {"expo_token": expoToken})
+            return await self.updateModel({"_id": self.getId()}, {"expo_token": expoToken})
         else:
             return None
     
     def getProfil(self):
-        return self.__profil
+        return getattr(self, "__profil", None)
     
     def setProfil(self, profil:str):
         self.__profil = profil
@@ -173,5 +181,3 @@ class User(Entity):
         if not any(char in "!@#$%^&*()_+-=" for char in value):
             raise HTTPException(status_code=400, detail={"error": "Password must contain at least one special character (!@#$%^&*()_+-=)"}) 
         return value
-    
-        

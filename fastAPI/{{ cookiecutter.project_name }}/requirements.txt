@@ -9,7 +9,9 @@ fastapi==0.110.0
 email-validator
 passlib[bcrypt]
 python-decouple==3.8
-pymongo==4.11
+motor
+redis
+fastapi-cache2[redis]
 pyarrow
 uvicorn 
 python-multipart
