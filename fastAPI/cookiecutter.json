@@ -7,5 +7,7 @@
     "description": "The backend for a FastAPI project.",
     "open_source": ["yes", "no"],
     "open_source_license": ["No license file", "MIT", "BSD-3-Clause"],
+    "database": ["supabase", "mongodb"],
+    "use_redis": ["yes", "no"],
     "python_interpreter": ["python3", "python"]
 }

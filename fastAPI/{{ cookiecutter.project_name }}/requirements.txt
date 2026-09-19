@@ -9,9 +9,15 @@ fastapi==0.110.0
 email-validator
 passlib[bcrypt]
 python-decouple==3.8
+{% if cookiecutter.database == 'mongodb' %}
 motor
+{% elif cookiecutter.database == 'supabase' %}
+supabase>=2.3.0
+{% endif %}
+{% if cookiecutter.use_redis == 'yes' %}
 redis
 fastapi-cache2[redis]
+{% endif %}
 pyarrow
 uvicorn 
 python-multipart
