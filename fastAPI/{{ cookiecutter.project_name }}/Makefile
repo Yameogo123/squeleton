@@ -122,6 +122,15 @@ else
 	@echo ">>> No virtualenv packages installed. Please install one above first"
 endif
 
+uv_env:
+	@echo "$(ccso)--> Set up python interpreter environment (uv)$(ccend)"
+	@echo ">>> Detected uv, creating uv environment."
+	uv sync
+
+uv_activate:
+	@echo "$(ccso)--> Activate uv environment$(ccend)"
+	source .venv/bin/activate
+
 ## Delete pyenv environment
 delete_pyenv_env:
 	@echo "$(ccso)--> Delete pyenv environment$(ccend)"

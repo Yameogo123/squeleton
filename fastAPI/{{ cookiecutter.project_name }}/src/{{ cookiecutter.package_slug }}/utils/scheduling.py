@@ -3,20 +3,41 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 import multiprocessing
 from apscheduler.schedulers.background import BackgroundScheduler
+{% if cookiecutter.use_redis == 'yes' %}
+from apscheduler.jobstores.redis import RedisJobStore
+{% else %}
 from apscheduler.jobstores.memory import MemoryJobStore
+{% endif %}
 from loguru import logger
 from decouple import config
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from fastapi_cache.backends.inmemory import InMemoryBackend
 from redis import asyncio as aioredis
-from {{ cookiecutter.package_slug }}.data.mongodb import init_indexes
+from {{ cookiecutter.package_slug }}.data.database import init_indexes
 
 
 # Configuration pour éviter les doublons
+{% if cookiecutter.use_redis == 'yes' %}
+# We extract host and port from REDIS_URL if available, or fallback to defaults
+# Standard redis url: redis://localhost:6379/0
+REDIS_URL_FOR_SCHEDULER = config("REDIS_URL", default="redis://localhost:6379/0")
+import urllib.parse
+redis_parsed = urllib.parse.urlparse(REDIS_URL_FOR_SCHEDULER)
+jobstores = {
+    'default': RedisJobStore(
+        jobs_key='apscheduler.jobs',
+        run_times_key='apscheduler.run_times',
+        host=redis_parsed.hostname or 'localhost',
+        port=redis_parsed.port or 6379,
+        db=int(redis_parsed.path.lstrip('/')) if redis_parsed.path.lstrip('/') else 0
+    )
+}
+{% else %}
 jobstores = {
     'default': MemoryJobStore()
 }
+{% endif %}
 job_defaults = {
     'coalesce': True,
     'max_instances': 1,

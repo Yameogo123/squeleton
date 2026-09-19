@@ -1,4 +1,4 @@
-from {{ cookiecutter.package_slug }}.data.mongodb import (
+from {{ cookiecutter.package_slug }}.data.database import (
     make_crud_action, handle_file
 )
 from {{ cookiecutter.package_slug }}.utils.controller import (
@@ -23,16 +23,34 @@ class Entity:
         return await make_crud_action(self.__model_name, "insert_many", documents= documents)
     
     async def updateModels(self, filter, update):
+{%- if cookiecutter.database == 'mongodb' %}
         return await make_crud_action(self.__model_name, "update_many", filter = filter, update = {"$set": update})
+{%- elif cookiecutter.database == 'supabase' %}
+        return await make_crud_action(self.__model_name, "update_many", filter = filter, update = update)
+{%- endif %}
 
     async def updateModel(self, filter, update):
+{%- if cookiecutter.database == 'mongodb' %}
         return await make_crud_action(self.__model_name, "update_one", filter = filter, update = {"$set": update})
+{%- elif cookiecutter.database == 'supabase' %}
+        return await make_crud_action(self.__model_name, "update_one", filter = filter, update = update)
+{%- endif %}
     
     async def pushUpdateModel(self, filter, update):
+{%- if cookiecutter.database == 'mongodb' %}
         return await make_crud_action(self.__model_name, "update_one", filter = filter, update = {"$addToSet": update})
+{%- elif cookiecutter.database == 'supabase' %}
+        # Note: In Supabase, appending to array requires using RPC or fetching and updating, 
+        # or assuming the update object maps cleanly to Postgres array append logic.
+        return await make_crud_action(self.__model_name, "update_one", filter = filter, update = update)
+{%- endif %}
     
     async def pullUpdateModel(self, filter, update):
+{%- if cookiecutter.database == 'mongodb' %}
         return await make_crud_action(self.__model_name, "update_one", filter = filter, update = {"$pull": update})
+{%- elif cookiecutter.database == 'supabase' %}
+        return await make_crud_action(self.__model_name, "update_one", filter = filter, update = update)
+{%- endif %}
     
     async def deleteModel(self, filter):
         return await make_crud_action(self.__model_name, "delete_one", filter = filter)
