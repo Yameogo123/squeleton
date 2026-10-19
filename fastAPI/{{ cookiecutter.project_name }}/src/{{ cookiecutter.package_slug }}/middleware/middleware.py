@@ -1,51 +1,69 @@
+"""JWT authentication: token creation + `JWTBearer` dependency returning the token payload."""
 
-from fastapi import HTTPException, Request
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-import time
+from datetime import UTC, datetime, timedelta
+
 import jwt
-from decouple import config
+from fastapi import Depends, HTTPException, Request, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+
+from {{ cookiecutter.package_slug }}.core.config import settings
+
+_UNAUTHORIZED = {"WWW-Authenticate": "Bearer"}
 
 
-JWT_SECRET = config("SECRET_KEY")
-JWT_ALGORITHM = config("ALGORITHM")
-EXPIRY = int(config("ACCESS_TOKEN_EXPIRE_MINUTES")) * 60
+def token_response(access_token: str) -> dict:
+    expires_in = settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
+    return {"access_token": access_token, "token_type": "Bearer", "expires_in": expires_in}
 
 
-def token_response(access_token:str):
-    return {"access_token": access_token, "token_type": "Bearer"}
-
-def signJWT(userID:str):
+def signJWT(user_id: str, role: str = "user") -> dict:
+    now = datetime.now(UTC)
     payload = {
-        "userID": userID,
-        "expiry": time.time() + EXPIRY
+        "sub": str(user_id),
+        "role": role,
+        "iat": now,
+        "exp": now + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
     }
-    token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    token = jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return token_response(token)
 
 
-def decodeJWT(token:str):
+def decodeJWT(token: str) -> dict | None:
     try:
-        decoded_token = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        return decoded_token if decoded_token["expiry"] >= time.time() else None
-    except Exception:
+        # pyjwt checks `exp` itself; `algorithms` is pinned to avoid alg-confusion attacks
+        return jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM], options={"require": ["exp", "sub"]}
+        )
+    except jwt.PyJWTError:
         return None
- 
+
 
 class JWTBearer(HTTPBearer):
     def __init__(self, auto_error: bool = True):
-        super(JWTBearer, self).__init__(auto_error=auto_error)
+        super().__init__(auto_error=False)
+        self._raise = auto_error
 
-    async def __call__(self, request: Request):
-        credentials: HTTPAuthorizationCredentials = await super(JWTBearer, self).__call__(request)
-        if credentials:
-            if credentials.scheme != "Bearer":
-                raise HTTPException(status_code=403, detail="Invalid authentication scheme")
-            if not self.verify_jwt(credentials.credentials):
-                raise HTTPException(status_code=403, detail="Invalid or expired token")
-            return credentials.credentials
-        else:
-            raise HTTPException(status_code=403, detail="Invalid authorization credentials")
+    async def __call__(self, request: Request) -> dict | None:
+        credentials: HTTPAuthorizationCredentials | None = await super().__call__(request)
+        payload = decodeJWT(credentials.credentials) if credentials and credentials.scheme.lower() == "bearer" else None
+        if payload is None:
+            if self._raise:
+                raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid or expired token", headers=_UNAUTHORIZED)
+            return None
+        request.state.user = payload
+        return payload
 
-    def verify_jwt(self, jwttoken: str) -> bool:
-        payload = decodeJWT(jwttoken)
-        return payload is not None
+
+get_current_user = JWTBearer()
+
+
+def require_admin(user: dict = Depends(get_current_user)) -> dict:
+    if user.get("role") != "admin":
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Admin only")
+    return user
+
+
+def ensure_owner_or_admin(user: dict, resource_user_id: str) -> None:
+    """Prevents IDOR: a user may only act on its own resources unless admin."""
+    if user.get("sub") != str(resource_user_id) and user.get("role") != "admin":
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Forbidden")

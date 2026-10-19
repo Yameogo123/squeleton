@@ -1,5 +1,5 @@
 # Variables
-DOCKER_COMPOSE = docker-compose
+DOCKER_COMPOSE = docker compose
 BACKEND_SERVICE = backend
 FRONTEND_SERVICE = frontend
 MONGO_SERVICE = mongo
@@ -172,6 +172,10 @@ sphinx-livehtml:
 #################################################################################
 
 ## Auto-generate the rst file for the Sphinx documentation
+docs-install:
+	@echo "$(ccso)--> Install the sphinx documentation toolchain$(ccend)"
+	$(PYTHON_INTERPRETER) -m uv pip install -r requirements-docs.txt
+
 generate_docs:
 	@echo "$(ccso)--> Generate the RST file for the Sphinx documentation$(ccend)"
 	sphinx-apidoc -o ./docs src/

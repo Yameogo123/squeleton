@@ -1,17 +1,11 @@
+import os
 
-from decouple import config
 
 class Utils:
     @staticmethod
-    def not_in_env(env):
+    def not_in_env(env: str) -> bool:
         """
-        Check if an environment variable is not set.
-
-        Args:
-            env (str): The name of the environment variable to check.
-
-        Returns:
-            bool: True if the environment variable is not set or is None, False otherwise.
+        Check if an environment variable is not set (or empty).
 
         Examples:
             >>> Utils.not_in_env("PATH")
@@ -19,18 +13,12 @@ class Utils:
             >>> Utils.not_in_env("NON_EXISTENT_VAR")
             True
         """
-        return config(env) is None
+        return not os.getenv(env)
 
     @staticmethod
-    def not_all_in_env(envs: list[str]):
+    def not_all_in_env(envs: list[str]) -> bool:
         """
-        Check if any of the specified environment variables are not set.
-
-        Args:
-            envs (list[str]): A list of environment variable names to check.
-
-        Returns:
-            bool: True if at least one environment variable is not set, False otherwise.
+        Check if at least one of the environment variables is not set.
 
         Examples:
             >>> Utils.not_all_in_env(["PATH", "NON_EXISTENT_VAR"])
@@ -38,6 +26,4 @@ class Utils:
             >>> Utils.not_all_in_env(["PATH", "HOME"])
             False
         """
-        check = [Utils.not_in_env(env) for env in envs]
-        return any(check)
-    
+        return any(Utils.not_in_env(env) for env in envs)

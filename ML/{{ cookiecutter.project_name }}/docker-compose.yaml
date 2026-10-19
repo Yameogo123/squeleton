@@ -1,17 +1,15 @@
-
 services:
   backend:
     build: .
+    env_file: .env
     ports:
       - "8000:8000"
-    volumes:
-      - .:/app  # Mount the current directory to /app in the container
-    command: python app/backend/main.py
+    restart: unless-stopped
 
   frontend:
     build: .
     ports:
       - "8501:8501"
-    volumes:
-      - .:/app  # Mount the current directory to /app in the container
-    command: streamlit run app/frontend/app.py --server.port 8501 --server.address 0.0.0.0
+    working_dir: /app/app/frontend
+    command: streamlit run app.py --server.port 8501 --server.address 0.0.0.0
+    restart: unless-stopped

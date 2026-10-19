@@ -29,7 +29,8 @@ cookiecutter https://github.com/Yameogo123/squeleton.git --directory="pythonPack
 ```
 
 ### 1. ⚡ FastAPI Application  
-For FastAPI applications using Python packaging system
+For FastAPI applications using Python packaging system: typed settings, JWT + RBAC, rate limiting,
+cache (Redis / in-memory), security middlewares, health checks, Docker, tests
 
 ```bash
 cookiecutter https://github.com/Yameogo123/squeleton.git --directory="fastAPI"
@@ -42,15 +43,25 @@ For Machine Learning projects in Python (using packaging)
 cookiecutter https://github.com/Yameogo123/squeleton.git --directory="ML"
 ```
 
-### 3. ⚛️ ReactJS Project
-For all React JS projects
+### 3. ⚛️ React + TypeScript Project (recommended)
+React 19 + TypeScript + Vite, Redux Toolkit, React Router, Tailwind 4, Vitest, security headers (CSP)
+
+```bash
+cookiecutter https://github.com/Yameogo123/squeleton.git --directory="reactTS"
+```
+
+### 3bis. ⚛️ ReactJS Project (legacy, Create React App)
+Kept for existing projects. Create React App is deprecated: prefer `reactTS` for new ones.
 
 ```bash
 cookiecutter https://github.com/Yameogo123/squeleton.git --directory="reactJS"
 ```
 
 ### 4. 📱 React Native Project
-*Coming soon*
+
+```bash
+cookiecutter https://github.com/Yameogo123/squeleton.git --directory="reactNative"
+```
 
 
 ---

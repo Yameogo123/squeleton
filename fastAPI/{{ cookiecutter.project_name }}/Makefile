@@ -1,167 +1,109 @@
-
 export TERM := xterm
 
-PROJECT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 PROJECT_NAME = {{ cookiecutter.project_name }}
 PACKAGE_NAME = {{ cookiecutter.package_slug }}
-PYTHON_INTERPRETER = python3
+PYTHON_INTERPRETER = {{ cookiecutter.python_interpreter }}
 PYTHON_VERSION = {{ cookiecutter.python_version }}
-PORT= 3000
+PORT ?= 3000
+WORKERS ?= 2
 
-VENV = venv
+VENV = .venv
 PYTHON = $(VENV)/bin/python
-PIP = $(VENV)/bin/pip
-APP_DIR = app
+UVICORN = $(VENV)/bin/uvicorn
 
-
-# echo colors
 ccend = $(shell tput sgr0)
-ccbold = $(shell tput bold)
-ccgreen = $(shell tput setaf 2)
-ccred = $(shell tput setaf 1)
 ccso = $(shell tput smso)
 
+.DEFAULT_GOAL := help
+.PHONY: help venv install dev-install prod-install run-app run run-test lint format typecheck test cov audit \
+        clean env dk-build dk-up dk-down dk-logs conda_env pyenv_env uv_env delete_pyenv_env git-push git-publish
 
-# Run FastAPI (using absolute paths)
-run-app:
-	@echo "--> Starting FastAPI"
-	$(PYTHON_INTERPRETER) -m uvicorn app.main:app --port $(PORT)
+help: ## Show this help
+	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
 
-run-test:
-	@echo "--> Starting FastAPI (dev, hot-reload) using uv"
-	uv run uvicorn app.main:app --reload
+# ------------------------------------------------------------------ setup
+venv: ## Create the .venv with uv
+	@test -d $(VENV) || uv venv $(VENV) --python $(PYTHON_VERSION)
 
+install: venv ## Install prod dependencies + the package (editable)
+	uv pip install --python $(PYTHON) -r requirements.txt -e .
 
-venv:
-	@echo "--> Creating virtual environment"
-	python3 -m venv $(VENV)
+dev-install: venv ## Install prod + dev dependencies and git hooks
+	uv pip install --python $(PYTHON) -r requirements.txt -r requirements-dev.txt -e .
+	@[ -d .git ] && $(VENV)/bin/pre-commit install || echo "--> run 'git init' then '$(VENV)/bin/pre-commit install' to enable git hooks"
 
-# Install dependencies
-install:
-	@echo "--> Installing dependencies"
-	$(PIP) install --upgrade pip
-	$(PIP) install -r requirements.txt
-	$(PIP) install -e .
+prod-install: ## Install in the current interpreter (servers without venv)
+	$(PYTHON_INTERPRETER) -m pip install -U pip
+	$(PYTHON_INTERPRETER) -m pip install -r requirements.txt .
 
-# Run FastAPI (using absolute paths)
-run:
-	@echo "--> Starting FastAPI"
-	$(PYTHON) -m uvicorn app.main:app --host 0.0.0.0 --port $(PORT)
+env: ## Create .env from .env.template if missing
+	@test -f .env || (cp .env.template .env && echo "--> .env created, fill in the secrets")
 
+# ------------------------------------------------------------------ run
+run-test: ## Dev server with hot reload
+	$(UVICORN) app.main:app --reload --port $(PORT)
 
-prod-backend: venv install run
+run-app: run-test
 
+run: ## Production-like server (multi workers, proxy headers)
+	$(UVICORN) app.main:app --host 0.0.0.0 --port $(PORT) --workers $(WORKERS) --proxy-headers --no-server-header
 
-ifeq (,$(shell which conda))
-HAS_CONDA = False
-else
-HAS_CONDA = True
-endif
+prod-backend: install run ## venv + install + run
 
-ifeq (,$(shell which pyenv))
-HAS_PYENV = False
-else
-HAS_PYENV = True
-endif
+# ------------------------------------------------------------------ quality
+lint: ## Lint (ruff, incl. security rules)
+	$(VENV)/bin/ruff check src app tests
 
-ifeq (,$(shell which poetry))
-HAS_POETRY = False
-else
-HAS_POETRY = True
-endif
+format: ## Format + autofix
+	$(VENV)/bin/ruff format src app tests
+	$(VENV)/bin/ruff check --fix src app tests
 
+typecheck: ## mypy
+	$(VENV)/bin/mypy src
 
-clean:
-	@echo "$(ccso)--> Delete all compile python files $(ccend)"
-	find . -type f -name "*.py[co]" -delete
-	find . -type d -name "__pycache__" -delete
+test: ## Run tests
+	$(VENV)/bin/pytest
 
+cov: ## Tests with coverage report
+	$(VENV)/bin/pytest --cov --cov-report=term-missing
 
-dev-install:
-	@echo "$(ccso) --> Install Python Dependencies (DEV)$(ccend)"
-	uv pip install -U pip setuptools wheel
-	uv pip install -r requirements-dev.txt
-	uv pip install -r requirements.txt
-	uv pip install -e .
+audit: ## Scan dependencies for known vulnerabilities
+	$(VENV)/bin/pip-audit -r requirements.txt
 
+clean: ## Remove caches
+	find . -type d \( -name "__pycache__" -o -name ".pytest_cache" -o -name ".ruff_cache" -o -name ".mypy_cache" \) -prune -exec rm -rf {} +
 
-prod-install:
-	@echo "$(ccso) --> Install Python Dependencies (PROD)$(ccend)"
-	$(PYTHON_INTERPRETER) -m pip install uv
-	$(PYTHON_INTERPRETER) -m uv pip install -U pip setuptools wheel
-	$(PYTHON_INTERPRETER) -m uv pip install --upgrade pip
-	$(PYTHON_INTERPRETER) -m uv pip install -r requirements.txt
-	$(PYTHON_INTERPRETER) -m uv pip install .
+# ------------------------------------------------------------------ docker
+dk-build: ## Build the image
+	docker compose build
 
+dk-up: env ## Start the stack
+	docker compose up -d
 
+dk-down: ## Stop the stack
+	docker compose down
 
-conda_env:
-	@echo "$(ccso)--> Set up python interpreter environment (conda)$(ccend)"
-ifeq (True,$(HAS_CONDA))
-	@echo ">>> Detected conda, creating conda environment."
-ifeq (3,$(findstring 3,$(PYTHON_INTERPRETER)))
-	conda create --name $(PACKAGE_NAME) python=3
-else
-	conda create --name $(PACKAGE_NAME) python=2.7
-endif
-	@echo ">>> New conda env created. Activate with:\nsource activate $(PACKAGE_NAME)"
-else
-	@echo ">>> No virtualenv packages installed. Please install one above first"
-endif
+dk-logs: ## Follow API logs
+	docker compose logs -f api
 
-## Set up python interpreter environment (pyenv)
-pyenv_env:
-	@echo "$(ccso)--> Set up python interpreter environment (pyenv)$(ccend)"
-ifeq (True,$(HAS_PYENV))
-	@echo ">>> Detected pyenv, creating pyenv environment."
-	pyenv virtualenv $(PYTHON_VERSION) $(PACKAGE_NAME)
-	@echo ">>> New pyenv created. Activate with: pyenv activate $(PACKAGE_NAME)"
-	pyenv local $(PACKAGE_NAME) 
-	@echo ">>> By default, the pyenv is activated in the local folder"
-else
-	@echo ">>> No virtualenv packages installed. Please install one above first"
-endif
-
-uv_env:
-	@echo "$(ccso)--> Set up python interpreter environment (uv)$(ccend)"
-	@echo ">>> Detected uv, creating uv environment."
+# ------------------------------------------------------------------ other envs
+uv_env: ## uv sync (uses pyproject)
 	uv sync
 
-uv_activate:
-	@echo "$(ccso)--> Activate uv environment$(ccend)"
-	source .venv/bin/activate
+conda_env: ## Create a conda env
+	conda create --name $(PACKAGE_NAME) python=$(PYTHON_VERSION)
+	@echo ">>> Activate with: conda activate $(PACKAGE_NAME)"
 
-## Delete pyenv environment
-delete_pyenv_env:
-	@echo "$(ccso)--> Delete pyenv environment$(ccend)"
+pyenv_env: ## Create a pyenv virtualenv
+	pyenv virtualenv $(PYTHON_VERSION) $(PACKAGE_NAME)
+	pyenv local $(PACKAGE_NAME)
+
+delete_pyenv_env: ## Delete the pyenv virtualenv
 	pyenv virtualenv-delete $(PACKAGE_NAME)
-	@echo "Fichier $(TEMPLATE_FILE) créé avec succès"
 
+git-push: ## add + commit + push (asks for a message)
+	@read -p "Message: " msg; git add .; git commit -m "$$msg"; git push
 
-git-push:
-	@echo "Enter commit message:"
-	@read -p "Message: " msg; \
-	git add .; \
-	git commit -m "$$msg"; \
-	git push
-
-git-publish: git-push
-	@echo "$(ccso)--> Publish the package to PyPI$(ccend)"
+git-publish: git-push ## push to the deploy remote (edit the URL)
 	git push git@git.evennode.com:xxxxx.com dev:master
 	git push origin dev
-
-# Default target
-all: pyenv_env run-app git-push git-publish
-
-
-# Help command to list all available targets
-help:
-	@echo "Available targets:"
-	@echo "  help          - Show this help message"
-	@echo "  pyenv_env     - Create environnement with pyenv"
-	@echo "  run-app       - launch uvicorn app"
-	@echo "  git-push      - push all to current git branch"
-	@echo "  git-publish   - push to evennode"
-
-# Default target
-.PHONY: all help

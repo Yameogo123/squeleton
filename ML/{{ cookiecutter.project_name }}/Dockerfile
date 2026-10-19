@@ -1,26 +1,18 @@
-# Use an official Python runtime as the base image
-FROM python:3.9-slim
+FROM python:{{ cookiecutter.python_version }}-slim
 
-# Set the working directory in the container
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 ENVIRONMENT=prod PORT=8000
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 WORKDIR /app
 
-# Copy the requirements file into the container
+# deps first (cached layer), then the code
 COPY requirements.txt .
-
-# Install the dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the entire project into the container
+RUN uv pip install --system --no-cache -r requirements.txt
 COPY . .
+RUN uv pip install --system --no-cache --no-deps . \
+    && useradd --create-home --uid 10001 appuser && chown -R appuser /app
+USER appuser
 
-# Install the package in editable mode
-RUN pip install -e .
+# Streamlit / FastAPI
+EXPOSE 8501 8000
 
-# Expose ports for Streamlit and FastAPI
-# Streamlit
-EXPOSE 8501  
-# FastAPI
-EXPOSE 8000  
-
-# Command to run the FastAPI backend
-CMD ["python", "app/backend/main.py"]
+CMD ["sh", "-c", "cd app/backend && exec uvicorn main:app --host 0.0.0.0 --port ${PORT} --proxy-headers --no-server-header"]

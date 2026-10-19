@@ -1,0 +1,11 @@
+{
+    "project_name": "My react project",
+    "project_slug": "{{ cookiecutter.project_name|lower|replace(' ', '-')|replace('_', '-') }}",
+    "node_version": "22",
+    "author_name": "TnT",
+    "site_title": "React app",
+    "description": "A template for React + TypeScript projects.",
+    "api_url": "http://localhost:3000",
+    "open_source_license": ["No license file", "MIT", "BSD-3-Clause"],
+    "version": ["0.1.0", "1.0.0", "0.0.1"]
+}
