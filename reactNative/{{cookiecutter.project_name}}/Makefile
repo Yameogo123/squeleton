@@ -1,78 +1,51 @@
-# Variables
-PROJECT_NAME = {{ cookiecutter.project_name }}
-# Node.js version to install
-NODE_VERSION = {{ cookiecutter.node_version }}  # Change this to the version you need
-# NVM install script URL
-NVM_INSTALL_URL = {{ cookiecutter.nvm_url }}
+NODE_VERSION = $(shell cat .nvmrc)
 
-# echo colors
-ccend = $(shell tput sgr0)
-ccbold = $(shell tput bold)
-ccgreen = $(shell tput setaf 2)
-ccred = $(shell tput setaf 1)
-ccso = $(shell tput smso)
+.DEFAULT_GOAL := help
+.PHONY: help use-node install start ios android web lint typecheck test check doctor fix-deps clean build-dev build-preview
 
-.PHONY: install-nvm install-node use-node install-packages clean-node
+help: ## Show this help
+	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
 
+use-node: ## Install/use the Node version from .nvmrc (nvm)
+	@. "$$HOME/.nvm/nvm.sh" && nvm install $(NODE_VERSION) && nvm use $(NODE_VERSION)
 
-# 1- Install NVM if not exists
-install-nvm:
-	@echo "$(ccso)--> 🔍 Checking if NVM is installed... $(ccend)"
-	@if ! command -v nvm &> /dev/null; then \
-		echo "$(ccso)--> ⚡ Installing NVM... $(ccend)"; \
-		curl -o- $(NVM_INSTALL_URL) | bash; \
-		export NVM_DIR="$$HOME/.nvm"; \
-		[ -s "$$NVM_DIR/nvm.sh" ] && \. "$$NVM_DIR/nvm.sh"; \
-		echo "$(ccso)--> ✅ NVM installed! Restart your terminal or run: source $$HOME/.nvm/nvm.sh $(ccend)"; \
-	else \
-		echo "$(ccso)--> ✅ NVM is already installed. $(ccend)"; \
-	fi
+install: ## npm install (commit package-lock.json)
+	npm install
 
-# 2- Install Node.js & npm using nvm
-install-node:
-	@echo "$(ccso)--> Installing Node.js $(NODE_VERSION) using nvm... $(ccend)"
-	@if [ -d "$$HOME/.nvm" ]; then \
-		source $$HOME/.nvm/nvm.sh && nvm install $(NODE_VERSION); \
-	else \
-		echo "$(ccso)--> ❌ NVM not found. Please install nvm first. $(ccend)"; \
-	fi
+start: ## Expo dev server (scan the QR code with Expo Go / dev build)
+	npx expo start
 
-# 3- Use the installed Node.js version
-use-node:
-	@echo "$(ccso)--> Setting Node.js version $(NODE_VERSION)... $(ccend)"
-	@if [ -d "$$HOME/.nvm" ]; then \
-		source $$HOME/.nvm/nvm.sh && nvm use $(NODE_VERSION); \
-	else \
-		echo "$(ccso)--> ❌ NVM not found. Please install nvm first. $(ccend)"; \
-	fi
+ios: ## iOS simulator
+	npx expo start --ios
 
-# 4- Install npm packages
-install-packages:
-	@echo "$(ccso)--> Installing npm packages... $(ccend)"
-	@if [ -d "$$HOME/.nvm" ]; then \
-		source $$HOME/.nvm/nvm.sh && nvm use $(NODE_VERSION) && npm install; \
-	else \
-		echo "$(ccso)--> ❌ NVM not found. Please install nvm first. $(ccend)"; \
-	fi
+android: ## Android emulator
+	npx expo start --android
 
-# Remove Node.js version
-clean-node:
-	@echo "$(ccso)--> Removing Node.js $(NODE_VERSION)... $(ccend)"
-	@if [ -d "$$HOME/.nvm" ]; then \
-		source $$HOME/.nvm/nvm.sh && nvm uninstall $(NODE_VERSION); \
-	else \
-		echo "$(ccso)--> ❌ NVM not found. Please install nvm first. $(ccend)"; \
-	fi
+web: ## Web
+	npx expo start --web
 
-install-tsconf:
-	npx tsc --init --esModuleInterop
+lint: ## expo lint
+	npm run lint
 
+typecheck: ## tsc
+	npm run typecheck
 
-# 1 + 2 + 3 + 4 - Default target: Runs all necessary steps in sequence
-all-install: install-nvm install-node use-node install-packages install-tsconf
+test: ## jest
+	npm test
 
-# to launch the script
-run: 
-	@echo "$(ccso)--> Running the script $(ccend)"
-	npm start
+check: lint typecheck test ## lint + types + tests
 
+doctor: ## Diagnose dependency / config issues
+	npx expo-doctor
+
+fix-deps: ## Align packages on the SDK versions (use instead of npm install <pkg>)
+	npx expo install --fix
+
+clean: ## Clear Metro / Expo caches
+	rm -rf .expo node_modules/.cache && npx expo start --clear
+
+build-dev: ## EAS development build
+	npx eas-cli@latest build --profile development
+
+build-preview: ## EAS internal preview build
+	npx eas-cli@latest build --profile preview

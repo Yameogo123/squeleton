@@ -247,4 +247,23 @@ help:
 	@echo "  help          - Show this help message"
 
 # Default target
-.PHONY: all build up down restart logs logs-% backend-shell frontend-shell mongo-shell clean help
+.PHONY: lint format test check audit all build up down restart logs logs-% backend-shell frontend-shell mongo-shell clean help
+
+# ------------------------------------------------------------------ quality (definition of done)
+lint:
+	@echo "$(ccso)--> Lint (ruff)$(ccend)"
+	$(PYTHON_INTERPRETER) -m ruff check src tests app
+
+format:
+	@echo "$(ccso)--> Format + autofix (ruff)$(ccend)"
+	$(PYTHON_INTERPRETER) -m ruff format src tests app
+	$(PYTHON_INTERPRETER) -m ruff check --fix src tests app
+
+test:
+	@echo "$(ccso)--> Tests (pytest)$(ccend)"
+	$(PYTHON_INTERPRETER) -m pytest -q tests
+
+check: lint test
+
+audit:
+	$(PYTHON_INTERPRETER) -m pip_audit -r requirements.txt

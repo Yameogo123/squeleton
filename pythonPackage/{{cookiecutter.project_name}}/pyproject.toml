@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68.0.0", "uv>=0.1.0"]
+requires = ["setuptools>=68.0.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -25,9 +25,6 @@ dynamic = ["dependencies", "optional-dependencies"]
 [project.urls]
 homepage = "https://www"
 
-[project.scripts]
-cli_hello_world = "project_name.cli_main_script:main_script.py"
-
 [tool.setuptools]
 package-dir = {"" = "src"}
 packages = { find = { where = ["src"] } }
@@ -36,9 +33,25 @@ packages = { find = { where = ["src"] } }
 # for prod
 dependencies = { file = ["requirements.txt"] }
 # for dev
-optional-dependencies = { dev = { file = ["requirements-dev.txt"] } }
+optional-dependencies = { dev = { file = ["requirements-dev.txt"] }, docs = { file = ["requirements-docs.txt"] } }
 
 # Configuration optionnelle pour uv (si nécessaire)
 [tool.uv]
 # Exemple de configuration possible :
 resolution = "highest"
+
+[tool.ruff]
+line-length = 120
+target-version = "py{{ cookiecutter.python_version | replace('.', '') }}"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "S", "UP"]
+ignore = ["E501"]  # the formatter handles code length; long docstrings are fine
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# importlib: tests/<package>.py must not shadow the real package
+addopts = "-q --import-mode=importlib"

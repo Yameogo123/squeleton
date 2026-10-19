@@ -46,3 +46,12 @@ target-version = "py{{ cookiecutter.python_version | replace('.', '') }}"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "S", "UP"]
+ignore = ["E501"]  # the formatter handles code length; long docstrings are fine
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# importlib: tests/<package>.py must not shadow the real package
+addopts = "-q --import-mode=importlib"

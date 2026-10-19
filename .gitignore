@@ -1,3 +1,4 @@
 draw.drawio
-.vscode
-.claude
+/.vscode/
+/.claude/
+.DS_Store

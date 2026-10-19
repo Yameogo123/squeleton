@@ -1,41 +1,63 @@
-# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
-
 # dependencies
 node_modules/
 
-# Expo
+# Expo / build
 .expo/
 dist/
 web-build/
 expo-env.d.ts
+*.tsbuildinfo
+coverage/
 
-# Native
-*.orig.*
+# generated native folders (Continuous Native Generation: config lives in app.json)
+/ios
+/android
+.kotlin/
+
+# signing (never commit)
 *.jks
+*.keystore
 *.p8
 *.p12
 *.key
+*.pem
 *.mobileprovision
+*.orig.*
+google-services.json
+GoogleService-Info.plist
+credentials.json
+service-account*.json
+eas-credentials*.json
 
-# Metro
+# Metro / debug
 .metro-health-check*
-
-# debug
 npm-debug.*
 yarn-debug.*
 yarn-error.*
 
-# macOS
+# editors / os
+.vscode/*
+!.vscode/extensions.json
+.idea/
 .DS_Store
+
+# --- secrets (never commit; templates stay)
+.env
+.env.*
+!.env.example
+!.env.template
 *.pem
+*.key
+*.p8
+*.p12
+*.pfx
+*.jks
+*.keystore
+id_rsa*
+credentials.json
+service-account*.json
+secrets/
 
-# local env files
-.env*.local
-
-# typescript
-*.tsbuildinfo
-
-app-example
-
-
-.vscode
+# --- Claude Code: shared config (.claude/, CLAUDE.md) is committed, personal files are not
+.claude/settings.local.json
+CLAUDE.local.md

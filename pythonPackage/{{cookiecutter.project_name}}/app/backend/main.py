@@ -1,28 +1,34 @@
+from decouple import Csv, config
 from fastapi import FastAPI
-import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
-from decouple import config
 
-PORT = config("PORT")
+PORT = config("PORT", default=8000, cast=int)
+ALLOW_ORIGINS = config("ALLOW_ORIGINS", default="http://localhost:8501", cast=Csv())
+ENVIRONMENT = config("ENVIRONMENT", default="dev")
 
-# Create FastAPI app
-app = FastAPI()
-
+# API docs only outside production
+app = FastAPI(docs_url=None if ENVIRONMENT == "prod" else "/docs", redoc_url=None)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], allow_credentials=True,
-    allow_methods=["*"], allow_headers=["*"]
+    allow_origins=ALLOW_ORIGINS,
+    allow_credentials="*" not in ALLOW_ORIGINS,  # browsers reject credentials with a wildcard
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["Authorization", "Content-Type"],
 )
+
 
 @app.get("/")
 async def read_root():
     return {"message": "Welcome to FastAPI with Uvicorn!"}
 
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+
+
 if __name__ == "__main__":
-    uvicorn.run(
-        "main:app",  # Points to the "app" instance in the "main" module
-        host="0.0.0.0",  # Accessible on your network
-        port= int(PORT),       # Port to listen on
-        reload=True      # Enable auto-reload for development
-    )
+    import uvicorn
+
+    uvicorn.run("main:app", host="0.0.0.0", port=PORT, reload=ENVIRONMENT == "dev")  # noqa: S104
