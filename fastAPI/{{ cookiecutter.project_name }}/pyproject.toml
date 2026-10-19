@@ -1,44 +1,56 @@
 [build-system]
-requires = ["setuptools>=68.0.0", "uv>=0.1.0"]
+requires = ["setuptools>=68.0.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "{{ cookiecutter.package_slug }}"
 version = "0.1.0"
 description = "{{ cookiecutter.description }}"
-authors = [
-    { name = "{{ cookiecutter.author_name }}", email = "xxxxxxxx@gmail.com" }
-]
-maintainers = [
-    { name = "TnT", email = "tryntry23@gmail.com" }
-]
+authors = [{ name = "{{ cookiecutter.author_name }}" }]
 readme = "README.md"
-license = { text = "{% if cookiecutter.open_source_license == 'MIT' %}MIT{% elif cookiecutter.open_source_license == 'BSD-3-Clause' %}BSD-3{% endif %}" }
-keywords = ["python", "TnT", "data-science", "ML"]
+{%- if cookiecutter.open_source_license != 'No license file' %}
+license = { text = "{{ cookiecutter.open_source_license }}" }
+{%- endif %}
+keywords = ["fastapi", "api"]
 classifiers = [
     "Programming Language :: Python :: 3",
+    "Framework :: FastAPI",
     "Operating System :: OS Independent",
 ]
-requires-python = ">=3.10"
+requires-python = ">={{ cookiecutter.python_version }}"
 dynamic = ["dependencies", "optional-dependencies"]
 
-[project.urls]
-homepage = "Code repo URL for your projects"
-
-[project.scripts]
-cli_hello_world = "{{ cookiecutter.package_slug }}.cli_main_script:hello_world"
-
 [tool.setuptools]
-package-dir = {"" = "src"}
+package-dir = { "" = "src" }
 packages = { find = { where = ["src"] } }
 
 [tool.setuptools.dynamic]
-# for prod
 dependencies = { file = ["requirements.txt"] }
-# for dev
 optional-dependencies = { dev = { file = ["requirements-dev.txt"] } }
 
-# Configuration optionnelle pour uv (si nécessaire)
-[tool.uv]
-# Exemple de configuration possible :
-resolution = "highest"
+# ---------------------------------------------------------------- tooling
+[tool.ruff]
+line-length = 120
+target-version = "py{{ cookiecutter.python_version | replace('.', '') }}"
+src = ["src", "app", "tests"]
+
+[tool.ruff.lint]
+# E/F: errors, I: imports, B: bugbear, S: bandit (security), UP: pyupgrade, ASYNC: blocking calls in async code
+select = ["E", "F", "I", "B", "S", "UP", "ASYNC", "SIM"]
+ignore = ["B008"]  # Depends()/File() in defaults is the FastAPI idiom
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S105", "S106"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+addopts = "-q"
+
+[tool.coverage.run]
+source = ["src", "app"]
+
+[tool.mypy]
+python_version = "{{ cookiecutter.python_version }}"
+ignore_missing_imports = true

@@ -1,59 +1,50 @@
-from fastapi import APIRouter, File, UploadFile, Depends, Request
-from {{ cookiecutter.package_slug }}.middleware.middleware import JWTBearer
-from {{ cookiecutter.package_slug }}.utils.controller import http_error
+from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
+
 from {{ cookiecutter.package_slug }}.entity.Files import Files
-from bson.objectid import ObjectId
+from {{ cookiecutter.package_slug }}.middleware.middleware import get_current_user
 from {{ cookiecutter.package_slug }}.utils.limiter import limiter
-from fastapi_cache.decorator import cache
 
 r_file = APIRouter()
 
+# File responses are not put in fastapi-cache (binary payloads); they send
+# Cache-Control headers instead so browsers / a CDN cache them.
+
+
+async def _file_response(file_id: str, inline: bool):
+    file = Files()
+    file.setId(file_id)
+    response = await (file.getStreaming() if inline else file.download())
+    if response is None:
+        raise HTTPException(404, "File not found")
+    return response
+
+
 @r_file.get("/image/{file_id}")
-@limiter.limit("5/second")
-@cache(expire=60)
+@limiter.limit("30/second")
 async def get_image(request: Request, file_id: str):
-    try:
-        file = Files()
-        file.setId(ObjectId(file_id))
-        return await file.getStreaming()
-    except Exception as e:
-        http_error(e, 500) 
+    return await _file_response(file_id, inline=True)
+
 
 @r_file.get("/download/{file_id}")
-@limiter.limit("5/second")
-@cache(expire=60)
-async def download_file(request: Request, file_id: str):
-    try:
-        file = Files()
-        file.setId(ObjectId(file_id))
-        return await file.download()
-    except Exception as e:
-        http_error(e, 500) 
-        
-@r_file.post("/file/save", dependencies=[Depends(JWTBearer())])
-@limiter.limit("5/second")
-async def save_file(request: Request, file: UploadFile = File(...)):
-    try:
-        files = Files()
-        files.load(file)
-        f_id = await files.save()
-        if f_id:
-            return {'result': f_id}
-        else:
-            return {'result': -1}
-    except Exception as e:
-        http_error(f"soucis de suvagarde de l'image: {e}", 500)
+@limiter.limit("10/second")
+async def download_file(request: Request, file_id: str, current: dict = Depends(get_current_user)):
+    return await _file_response(file_id, inline=False)
 
-@r_file.delete("/file/{id}", dependencies=[Depends(JWTBearer())], tags=['file'])
+
+@r_file.post("/file/save", status_code=201)
 @limiter.limit("5/second")
-async def deleteFile(request: Request, id:str):
-    try:
-        files = Files()
-        files.setId(ObjectId(id))
-        resp = await files.delete()
-        if resp:
-            return {"message": "file deleted with success"}
-        else:
-            return {"message": "file not deleted (id inexistant?)"}
-    except Exception as e:
-        http_error(e, 500)
+async def save_file(request: Request, file: UploadFile = File(...), current: dict = Depends(get_current_user)):
+    f_id = await Files(file).save()
+    if not f_id:
+        raise HTTPException(500, "File not saved")
+    return {"result": f_id}
+
+
+@r_file.delete("/file/{id}")
+@limiter.limit("5/second")
+async def delete_file(request: Request, id: str, current: dict = Depends(get_current_user)):
+    file = Files()
+    file.setId(id)
+    if await file.delete():
+        return {"message": "File deleted"}
+    raise HTTPException(404, "File not found")

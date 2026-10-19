@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68.0.0", "uv>=0.1.0"]
+requires = ["setuptools>=68.0.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -19,14 +19,11 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
 ]
-requires-python = ">=3.10"
+requires-python = ">={{ cookiecutter.python_version }}"
 dynamic = ["dependencies", "optional-dependencies"]
 
 [project.urls]
 homepage = "Code repo URL for your projects"
-
-[project.scripts]
-cli_hello_world = "project_name.cli_main_script:hello_world"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
@@ -36,9 +33,16 @@ packages = { find = { where = ["src"] } }
 # for prod
 dependencies = { file = ["requirements.txt"] }
 # for dev
-optional-dependencies = { dev = { file = ["requirements-dev.txt"] } }
+optional-dependencies = { dev = { file = ["requirements-dev.txt"] }, docs = { file = ["requirements-docs.txt"] } }
 
 # Configuration optionnelle pour uv (si nécessaire)
 [tool.uv]
 # Exemple de configuration possible :
 resolution = "highest"
+
+[tool.ruff]
+line-length = 120
+target-version = "py{{ cookiecutter.python_version | replace('.', '') }}"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "S", "UP"]

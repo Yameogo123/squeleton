@@ -1,0 +1,61 @@
+services:
+  api:
+    build: .
+    env_file: .env
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT:-dev}
+{%- if cookiecutter.database == 'mongodb' %}
+      MONGODB_URL: mongodb://mongo:27017
+{%- endif %}
+{%- if cookiecutter.use_redis == 'yes' %}
+      REDIS_URL: redis://redis:6379/0
+{%- endif %}
+    ports:
+      - "3000:3000"
+    depends_on:
+{%- if cookiecutter.database == 'mongodb' %}
+      mongo:
+        condition: service_healthy
+{%- endif %}
+{%- if cookiecutter.use_redis == 'yes' %}
+      redis:
+        condition: service_healthy
+{%- endif %}
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+{% if cookiecutter.database == 'mongodb' %}
+  mongo:
+    image: mongo:8
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+{% endif %}
+{%- if cookiecutter.use_redis == 'yes' %}
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+{% endif %}
+volumes:
+{%- if cookiecutter.database == 'mongodb' %}
+  mongo-data:
+{%- endif %}
+{%- if cookiecutter.use_redis == 'yes' %}
+  redis-data:
+{%- endif %}

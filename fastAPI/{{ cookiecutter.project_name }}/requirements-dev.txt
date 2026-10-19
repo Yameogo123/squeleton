@@ -1,8 +1,8 @@
-
-black
-coverage
-pre-commit
+ruff>=0.8
+mypy>=1.13
+pytest>=8.3
+pytest-asyncio>=0.25
+pytest-cov>=6.0
+pre-commit>=4.0
+pip-audit>=2.7
 ipykernel
-pytest==8.1.1
-pipreqs==0.5.0
-
