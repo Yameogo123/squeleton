@@ -14,3 +14,11 @@ tests
 notebooks
 *.md
 !README.md
+
+# Claude Code / editor config, never in the image
+.claude
+CLAUDE.md
+CLAUDE.local.md
+ARCHITECTURE.md
+*.pem
+*.key

@@ -1,8 +1,8 @@
-import streamlit as st
 import inspect
 
-from {{ cookiecutter.package_slug }}.utils import logger, reader, utils
+import streamlit as st
 
+from {{ cookiecutter.package_slug }}.utils import logger, reader, utils
 
 saw = []
 
@@ -11,12 +11,14 @@ st.write("Show the docstrings of my functions.")
 
 tabs = st.tabs(["ETL", "Data", "Models", "Utils"])
 
+
 def display_docstrings(obj):
     if obj.__name__ not in saw:
         saw.append(obj.__name__)
         """Extracts and displays docstrings for functions and classes."""
         st.subheader(f"Docstring for `{obj.__name__}`")
         st.code(inspect.getdoc(obj), language="markdown")
+
 
 # Function to extract and display function docstrings
 def display_function_docstrings(module):
@@ -27,6 +29,7 @@ def display_function_docstrings(module):
             if inspect.isfunction(obj):  # Ensure it's a function
                 st.subheader(f"Function: `{name}`")
                 st.code(inspect.getdoc(obj), language="markdown")
+
 
 with tabs[0]:
     st.write("ETL stands for Extract, Transform, Load.")

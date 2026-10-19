@@ -7,9 +7,9 @@ from datetime import date
 
 # -- Project information -----------------------------------------------------
 
-project = f'{{ cookiecutter.project_name }}'
+project = f'{{ cookiecutter.package_slug }}'
 copyright = f'{date.today().year}, TnT'
-author = f'{{ cookiecutter.project_name }}'
+author = f'{{ cookiecutter.package_slug }}'
 
 
 # -- General configuration ---------------------------------------------------
@@ -106,11 +106,11 @@ html_use_index = True
 
 
 # -- Options for LaTeX output --------------------------------
-title = f'{{ cookiecutter.project_name }}'  # \\newline\\newline\\large PDF Version"
+title = f'{{ cookiecutter.package_slug }}'  # \\newline\\newline\\large PDF Version"
 # The master toctree document.
 master_doc = "index"
 latex_theme = "manual"  # 'manual' to make a book, 'howto' to make an article
-latex_documents = [("index", f"{{ cookiecutter.project_name }}.tex", title, author, "howto")]
+latex_documents = [("index", f"{{ cookiecutter.package_slug }}.tex", title, author, "howto")]
 # latex_engine = 'xelatex'
 latex_logo = "./_static/logo.jpg"
 
@@ -129,7 +129,7 @@ version = "1.0"
 
 simplepdf_debug = False
 
-simplepdf_file_name = f'{{ cookiecutter.project_name }}.pdf'
+simplepdf_file_name = f'{{ cookiecutter.package_slug }}.pdf'
 
 simplepdf_vars = {
     # 'cover-overlay': 'rgba(26, 150, 26, 0.7)',

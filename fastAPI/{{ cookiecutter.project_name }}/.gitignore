@@ -1,8 +1,3 @@
-# secrets
-.env
-.env.*
-!.env.template
-
 # python
 __pycache__/
 *.py[cod]
@@ -23,3 +18,24 @@ htmlcov/
 .DS_Store
 .vscode/
 .idea/
+
+# --- secrets (never commit; templates stay)
+.env
+.env.*
+!.env.example
+!.env.template
+*.pem
+*.key
+*.p8
+*.p12
+*.pfx
+*.jks
+*.keystore
+id_rsa*
+credentials.json
+service-account*.json
+secrets/
+
+# --- Claude Code: shared config (.claude/, CLAUDE.md) is committed, personal files are not
+.claude/settings.local.json
+CLAUDE.local.md

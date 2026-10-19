@@ -1,53 +1,52 @@
 {
   "expo": {
-    "name": "{{cookiecutter.project_name}}",
-    "slug": "{{cookiecutter.project_slug}}",
-    "version": "{{cookiecutter.version}}",
+    "name": "{{ cookiecutter.project_name }}",
+    "slug": "{{ cookiecutter.project_slug }}",
+    "version": "{{ cookiecutter.version }}",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "{{cookiecutter.project_slug}}",
+    "scheme": "{{ cookiecutter.project_slug }}",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "primaryColor": "{{ cookiecutter.primary_color }}",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.wendyam123.{{cookiecutter.project_slug}}"
+      "bundleIdentifier": "{{ cookiecutter.bundle_id }}",
+      "config": { "usesNonExemptEncryption": false }
     },
     "android": {
+      "package": "{{ cookiecutter.bundle_id }}",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.wendyam123.{{cookiecutter.project_slug}}"
+      "allowBackup": false,
+      "blockedPermissions": ["android.permission.RECORD_AUDIO"]
     },
     "web": {
-      "bundler": "metro",
-      "output": "static",
+      "output": "single",
       "favicon": "./assets/images/favicon.png"
-    },
-    "splash": {
-      "image": "./assets/images/icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#FFFFFF"
     },
     "plugins": [
       "expo-router",
+      "expo-secure-store",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/icon.png",
-          "imageWidth": 200,
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 160,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#ffffff",
+          "dark": { "backgroundColor": "#0B0B10" }
         }
       ]
     ],
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": true,
+      "reactCompiler": true
     },
     "extra": {
-      "router": {
-        "origin": false
-      }
+      "apiUrl": "{{ cookiecutter.api_url }}",
+      "apiPort": "{{ cookiecutter.api_port }}"
     }
   }
 }

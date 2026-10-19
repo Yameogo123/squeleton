@@ -1,12 +1,13 @@
-
 {
-    "project_name": "My react native project",
-    "project_slug": ["{{ cookiecutter.project_name|lower|replace(' ', '_') }}"],
-    "node_version": "18.17.1",
-    "nvm_url": "https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.4/install.sh",
+    "project_name": "My mobile app",
+    "project_slug": "{{ cookiecutter.project_name|lower|replace(' ', '-')|replace('_', '-') }}",
+    "bundle_id": "com.wendyam123.{{ cookiecutter.project_slug|replace('-', '') }}",
     "author_name": "TnT",
-    "description": "A template for react native projects.",
-    "open_source": ["yes", "no"],
-    "open_source_license": ["No license file", "MIT", "BSD-3-Clause"],
-    "version": ["1.0.0", "0.1.0", "0.0.1"]
+    "description": "A React Native (Expo) mobile app.",
+    "api_url": "",
+    "api_port": "3000",
+    "primary_color": "#6A52ED",
+    "node_version": "22",
+    "version": ["1.0.0", "0.1.0", "0.0.1"],
+    "_copy_without_render": ["src/*"]
 }

@@ -2,7 +2,6 @@
 
 # dependencies
 /node_modules
-package-lock.json
 /.pnp
 .pnp.js
 
@@ -14,11 +13,28 @@ package-lock.json
 
 # misc
 .DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
 
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# --- secrets (never commit; templates stay)
+.env
+.env.*
+!.env.example
+!.env.template
+*.pem
+*.key
+*.p8
+*.p12
+*.pfx
+*.jks
+*.keystore
+id_rsa*
+credentials.json
+service-account*.json
+secrets/
+
+# --- Claude Code: shared config (.claude/, CLAUDE.md) is committed, personal files are not
+.claude/settings.local.json
+CLAUDE.local.md

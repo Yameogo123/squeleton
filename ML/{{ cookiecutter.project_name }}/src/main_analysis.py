@@ -1,22 +1,22 @@
-
-#%% import
-from {{ cookiecutter.package_slug }}.utils.reader import Reader
-from loguru import logger
-from {{ cookiecutter.package_slug }}.data.analysis.analysis import save_desc, get_correlation, detect_errors
-from {{ cookiecutter.package_slug }}.utils.utils import save_to_parquet
-from skimpy import skim
+# %% import
 import os
-from tabulate import tabulate
-import pretty_errors
 
-#%% variables
+from loguru import logger
+from skimpy import skim
+from tabulate import tabulate
+
+from {{ cookiecutter.package_slug }}.data.analysis.analysis import detect_errors, get_correlation, save_desc
+from {{ cookiecutter.package_slug }}.utils.reader import Reader
+from {{ cookiecutter.package_slug }}.utils.utils import save_to_parquet
+
+# %% variables
 
 PROCESSED_PATH = "../data/processed"
 OUTPUT_PATH = "../reports/analysis"
 
-os.makedirs(OUTPUT_PATH+"/description", exist_ok=True)
-os.makedirs(OUTPUT_PATH+"/correlation", exist_ok=True)
-os.makedirs(OUTPUT_PATH+"/detection", exist_ok=True)
+os.makedirs(OUTPUT_PATH + "/description", exist_ok=True)
+os.makedirs(OUTPUT_PATH + "/correlation", exist_ok=True)
+os.makedirs(OUTPUT_PATH + "/detection", exist_ok=True)
 
 save_description = True
 save_correlation = True
@@ -25,7 +25,7 @@ logger.info(f"Load data from {PROCESSED_PATH}")
 dataframes = Reader.read_all_files_in_directory(PROCESSED_PATH)
 
 
-#%% data preview
+# %% data preview
 
 
 for name in dataframes.keys():
@@ -49,9 +49,8 @@ for name in dataframes.keys():
     if save_correlation:
         logger.info(f"saving errors in {OUTPUT_PATH}/correlation")
         save_to_parquet(corrs, f"{OUTPUT_PATH}/correlation/{name}.parquet")
-    print(tabulate(corrs, headers='keys', tablefmt='grid'))
+    print(tabulate(corrs, headers="keys", tablefmt="grid"))
     logger.info("-----------------------------------------------")
 
 
 # %%
-

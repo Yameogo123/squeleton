@@ -1,14 +1,18 @@
-import streamlit as st
-from {{ cookiecutter.package_slug }}.utils.reader import Reader
 import os
+
+import streamlit as st
+
+from {{ cookiecutter.package_slug }}.utils.reader import Reader
+
 
 def get_file_names_without_extension(folder_path):
     try:
         # List all files and remove extensions
         files = [os.path.splitext(f)[0] for f in os.listdir(folder_path) if not os.path.splitext(f)[0].startswith(".")]
         return files
-    except Exception as e:
+    except Exception:
         return []
+
 
 PROCESSED_PATH = "../../data/processed"
 
@@ -31,8 +35,6 @@ with st.spinner("Loading data..."):
     detections = Reader.read_all_files_in_directory(DETECTION_PATH)
 
 
-
-
 with tabs[0]:
     st.write("Get your data analysis.")
 
@@ -41,7 +43,7 @@ with tabs[0]:
             <div style='color: red; font-weight: bold;'>⚠️ Note: This section need the data of reports meaning you have to launch the analysis first:</div>
             <code style='color: red; font-weight: bold;'>make run_analysis</code>
         """,
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
     datas = get_file_names_without_extension(PROCESSED_PATH)
@@ -55,15 +57,17 @@ with tabs[0]:
                 st.title("Correlation:")
                 st.dataframe(correlations[selection], use_container_width=True)
 
-            if any([selection+"_number_description" in descriptions, selection+"_string_description" in descriptions]):
+            if any(
+                [selection + "_number_description" in descriptions, selection + "_string_description" in descriptions]
+            ):
                 st.title("Description:")
                 col1, col2 = st.columns(2)
                 with col1:
                     st.write("For Number type:")
-                    st.dataframe(descriptions[selection+"_number_description"], use_container_width=True)
+                    st.dataframe(descriptions[selection + "_number_description"], use_container_width=True)
                 with col2:
                     st.write("For String type:")
-                    st.dataframe(descriptions[selection+"_string_description"], use_container_width=True)
+                    st.dataframe(descriptions[selection + "_string_description"], use_container_width=True)
 
             if selection in detections:
                 st.title("Mismatch types in data:")
@@ -75,7 +79,7 @@ with tabs[0]:
                     <div style='color: red; font-weight: bold;'>⚠️ Note: This section need the data of reports meaning you have to launch the analysis first:</div>
                     <code style='color: red; font-weight: bold;'>make run_analysis</code>
                 """,
-                unsafe_allow_html=True
+                unsafe_allow_html=True,
             )
 
 
